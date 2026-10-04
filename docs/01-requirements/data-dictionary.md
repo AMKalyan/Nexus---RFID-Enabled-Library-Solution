@@ -44,7 +44,7 @@ Conventions:
 | | `role_id` | uuid FK → role | |
 | | `is_active` | bool | |
 | | `last_login_at` | timestamptz | |
-| `refresh_token` | `id`, `subject_type`, `subject_id`, `token_hash`, `expires_at`, `revoked_at` | | Only the hash is stored; rotated on every refresh |
+| `refresh_token` | `id`, `family_id`, `subject_type`, `subject_id`, `token_hash`, `expires_at`, `revoked_at` | | Only the hash is stored; rotated on every refresh; reuse of a revoked token revokes the whole family |
 
 ## nexus: catalogue and tagging
 

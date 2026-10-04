@@ -59,7 +59,7 @@ Trust boundaries:
 ## 4. Authentication details
 
 - **Password login:** argon2id with time cost 3, 64 MiB memory and parallelism 2. A generic `INVALID_CREDENTIALS` response avoids revealing whether a username exists.
-- **Tokens:** access JWT (HS256, 15 min) with claims `sub`, `typ` (`staff`/`patron`), `role`, `jti`. Permissions are re-read from the database on each request, cached for 60 s. Refresh tokens are opaque random values stored as SHA-256 hashes and rotated on every use; reusing an old one revokes the whole token family.
+- **Tokens:** access JWT (HS256, 15 min) with claims `sub`, `typ` (`staff`/`patron`), `role`, `jti`. Permissions are re-read from the database on each request, so role changes take effect immediately. Refresh tokens are opaque random values stored as SHA-256 hashes and rotated on every use; reusing an old one revokes the whole token family.
 - **Smart card:** challenge-response handshake (interface design §2.4). Challenges are single-use, last 60 s, and are bound to the reader code. Unknown or deactivated cards are refused and audited.
 - **Devices and NCIP agencies:** API keys of 32 random bytes, stored hashed and rotatable by an Admin.
 

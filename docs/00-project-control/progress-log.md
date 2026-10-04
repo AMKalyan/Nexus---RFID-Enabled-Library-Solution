@@ -30,4 +30,8 @@ A running record of delivery against the SOP §9 stages. It is updated at every 
 - Stage 1 merged and tagged `sop-stage-1`.
 - Stage 2 on `stage/2-design`: use cases, data dictionary, architecture, database, interface and security designs, ADR-0001..0005, design review, implementation plan.
 
-**Next task:** Stage 2 gate → merge → tag `sop-stage-2`, then Task 1 of `implementation-plan.md` on `stage/3-foundation` (needs Docker Desktop running for Task 2 onwards).
+- Stage 2 merged and tagged `sop-stage-2`.
+- Stage 3 started on `stage/3-foundation`: Task 1 (backend skeleton, config, logging, sanitised errors, version endpoint) done, 6 unit tests passing.
+- Paused for the development host reboot that completes the Docker Desktop installation.
+
+**Next task:** Task 2 of `implementation-plan.md` (database, roles, models, baseline migration) on `stage/3-foundation`. Before starting, check that `docker version` works, then create `.env` from `.env.example` with dev passwords `devowner` / `devapp`.

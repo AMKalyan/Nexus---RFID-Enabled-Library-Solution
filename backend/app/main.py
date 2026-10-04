@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from slowapi.errors import RateLimitExceeded
 
-from app.api.v1 import health
+from app.api.v1 import auth, health
 from app.core.config import get_settings
 from app.core.errors import install_error_handlers
 from app.core.logging import configure_logging
@@ -27,6 +27,7 @@ def create_app(check_db: bool = True) -> FastAPI:
         return JSONResponse({"error": "Too many requests", "code": "ERR_RATE_LIMIT"}, status_code=429)
 
     app.include_router(health.router, prefix="/api/v1")
+    app.include_router(auth.router, prefix="/api/v1")
     return app
 
 

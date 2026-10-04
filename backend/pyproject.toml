@@ -13,7 +13,10 @@ select = ["E", "F", "I", "B", "UP", "S", "SIM"]
 ignore = ["S101"]
 
 [tool.ruff.lint.per-file-ignores]
-"tests/**" = ["S105", "S106", "S603", "S608"]
+"tests/**" = ["S105", "S106", "S107", "S603", "S608"]
+
+[tool.ruff.lint.flake8-bugbear]
+extend-immutable-calls = ["fastapi.Depends", "fastapi.Query", "fastapi.File", "fastapi.Form", "fastapi.Body"]
 
 [tool.mypy]
 python_version = "3.12"

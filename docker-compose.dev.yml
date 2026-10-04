@@ -1,0 +1,4 @@
+# Development override: exposes PostgreSQL on localhost:5433 for local test runs.
+services:
+  db:
+    ports: ["5433:5432"]

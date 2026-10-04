@@ -14,14 +14,14 @@ Status values: Open, In progress, Done, Deferred.
 | NX-005 | Risk register, dependencies, excluded work | stage-1, doc | Stage 1 | Done | Stage 1 merge |
 | NX-006 | Synthetic data and credentials declaration | stage-1, NFR-02 | Stage 1 | Done | Stage 1 merge |
 | NX-007 | Branch strategy and repository conventions | stage-1, doc | Stage 1 | Done | Stage 1 merge |
-| NX-010 | Use cases and acceptance criteria AC 01–10 | stage-2, doc | Stage 2 | Open | |
-| NX-011 | Domain model, ER diagram, data dictionary | stage-2, doc | Stage 2 | Open | |
-| NX-012 | API contract (OpenAPI draft) and event model | stage-2, FR-03 | Stage 2 | Open | |
-| NX-013 | Mock contracts: ILMS, NCIP, SIP2, devices, notifications, camera, credentials | stage-2, FR-03 | Stage 2 | Open | |
-| NX-014 | Security design and RBAC matrix | stage-2, NFR-02 | Stage 2 | Open | |
-| NX-015 | Context, component and deployment diagrams | stage-2, doc | Stage 2 | Open | |
-| NX-016 | ADRs and design review minutes | stage-2, doc | Stage 2 | Open | |
-| NX-017 | Implementation plan for Stages 3–7 | stage-2, doc | Stage 2 | Open | |
+| NX-010 | Use cases and acceptance criteria AC 01–10 | stage-2, doc | Stage 2 | Done | Stage 2 merge |
+| NX-011 | Domain model, ER diagram, data dictionary | stage-2, doc | Stage 2 | Done | Stage 2 merge |
+| NX-012 | API contract (OpenAPI draft) and event model | stage-2, FR-03 | Stage 2 | Done | Stage 2 merge |
+| NX-013 | Mock contracts: ILMS, NCIP, SIP2, devices, notifications, camera, credentials | stage-2, FR-03 | Stage 2 | Done | Stage 2 merge |
+| NX-014 | Security design and RBAC matrix | stage-2, NFR-02 | Stage 2 | Done | Stage 2 merge |
+| NX-015 | Context, component and deployment diagrams | stage-2, doc | Stage 2 | Done | Stage 2 merge |
+| NX-016 | ADRs and design review minutes | stage-2, doc | Stage 2 | Done | Stage 2 merge |
+| NX-017 | Implementation plan for Stages 3–7 | stage-2, doc | Stage 2 | Done | Stage 2 merge |
 | NX-020 | Foundation build (scaffold, config, auth, RBAC, audit, health, migrations, CI, seeds) | stage-3 | Stage 3 | Open | |
 | NX-030 | Core library functions | stage-4, FR-01, FR-02, FR-04, FR-08 | Stage 4 | Open | |
 | NX-040 | RFID middleware and integrations | stage-5, FR-03, FR-05, FR-06, FR-07, FR-09 | Stage 5 | Open | |

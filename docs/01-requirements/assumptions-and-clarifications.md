@@ -1,6 +1,6 @@
 # Assumptions and Clarification Log
 
-Owner: Moksh · Opened: 2026-10-04 (SOP Stage 1)
+Opened 2026-10-04 (Stage 1).
 
 No client contact is available during the candidate exercise. Each question below is answered with a documented working assumption. The assumption becomes a decision at the Stage 2 design review, and can be reopened if the evaluator clarifies.
 

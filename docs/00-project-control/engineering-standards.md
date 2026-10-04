@@ -1,6 +1,6 @@
 # Engineering Standards
 
-Status: Approved (SOP Stage 1) · Owner: Moksh · Applies to: all code, configuration, data and documentation in this repository.
+Applies to all code, configuration, data and documentation in this repository.
 
 These standards implement SOP §10 (Engineering controls) and NFR 02 (Security and privacy). A change that violates a standard requires an Architecture Decision Record (ADR) in `docs/02-design/adr/`.
 

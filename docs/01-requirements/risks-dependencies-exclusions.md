@@ -1,23 +1,23 @@
 # Risks, Dependencies and Excluded Work
 
-Owner: Moksh · Opened: 2026-10-04 (SOP Stage 1)
+Opened 2026-10-04 (Stage 1).
 
 ## 1. Risk register
 
 Likelihood (L) and impact (I) are rated High, Medium or Low.
 
-| ID | Risk | L | I | Mitigation | Owner | Status |
-|---|---|---|---|---|---|---|
-| R-01 | 48-hour time box is too short for full scope (12 FR, 9 NFR, 9 deliverables) | H | H | Acceptance-scenario-first vertical slices; non-AC features as Partial/Backlog in the RTM; daily cut-line | Moksh | Open |
-| R-02 | Legacy records accidentally modified by migration or integration | L | H | Read-only DB role on `legacy_ilms`; mandatory backup before change; checksum integrity tool; AC 10 test | Moksh | Open |
-| R-03 | Container runtime unavailable or unreliable on Windows host | M | H | Docker Desktop with WSL2 on the dev host; documented Windows Server 2022 options; native install noted in backlog | Moksh | Open |
-| R-04 | Offline install fails due to missing dependency | M | H | Bundle all images with `docker save`; SHA-256 checksums; install rehearsal with network disabled | Moksh | Open |
-| R-05 | Personal data or secrets committed by mistake | L | H | Synthetic-data declaration; `.gitignore` for `.env`/keys; secret scan in pipeline; review at every gate | Moksh | Open |
-| R-06 | Mock behaviour diverges from real devices/protocols | M | M | Contracts documented independently of mocks; mocks exercise timeouts, duplicates and offline modes | Moksh | Open |
-| R-07 | Evaluator reads NCIP/SIP2 subset as a compliance claim | M | M | Explicit "no certification claimed" statements; message coverage tables | Moksh | Open |
-| R-08 | 20k-row import is slow or locks the DB | M | M | Bulk insert into staging; set-based validation; single commit transaction; timed perf test | Moksh | Open |
-| R-09 | Dependency licence incompatible with offline redistribution | L | M | Prefer MIT/BSD/Apache/PostgreSQL licences; SBOM with licence review | Moksh | Open |
-| R-10 | Demo failure on the day (environment drift) | M | H | Scripted demo, seed reset command, recorded fallback video | Moksh | Open |
+| ID | Risk | L | I | Mitigation | Status |
+|---|---|---|---|---|---|
+| R-01 | 48-hour time box is too short for full scope (12 FR, 9 NFR, 9 deliverables) | H | H | Acceptance-scenario-first vertical slices; non-AC features as Partial/Backlog in the RTM; daily cut-line | Open |
+| R-02 | Legacy records accidentally modified by migration or integration | L | H | Read-only DB role on `legacy_ilms`; mandatory backup before change; checksum integrity tool; AC 10 test | Open |
+| R-03 | Container runtime unavailable or unreliable on Windows host | M | H | Docker Desktop with WSL2 on the dev host; documented Windows Server 2022 options; native install noted in backlog | Open |
+| R-04 | Offline install fails due to missing dependency | M | H | Bundle all images with `docker save`; SHA-256 checksums; install rehearsal with network disabled | Open |
+| R-05 | Personal data or secrets committed by mistake | L | H | Synthetic-data declaration; `.gitignore` for `.env`/keys; secret scan in pipeline; review at every gate | Open |
+| R-06 | Mock behaviour diverges from real devices/protocols | M | M | Contracts documented independently of mocks; mocks exercise timeouts, duplicates and offline modes | Open |
+| R-07 | Evaluator reads NCIP/SIP2 subset as a compliance claim | M | M | Explicit "no certification claimed" statements; message coverage tables | Open |
+| R-08 | 20k-row import is slow or locks the DB | M | M | Bulk insert into staging; set-based validation; single commit transaction; timed perf test | Open |
+| R-09 | Dependency licence incompatible with offline redistribution | L | M | Prefer MIT/BSD/Apache/PostgreSQL licences; SBOM with licence review | Open |
+| R-10 | Demo failure on the day (environment drift) | M | H | Scripted demo, seed reset command, recorded fallback video | Open |
 
 ## 2. Dependencies
 

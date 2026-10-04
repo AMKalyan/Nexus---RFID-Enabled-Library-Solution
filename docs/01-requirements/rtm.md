@@ -1,6 +1,6 @@
 # Requirements Traceability Matrix (RTM)
 
-Version: 0.1 (SOP Stage 1 baseline) · Owner: Moksh
+Version 0.1 (Stage 1 baseline).
 
 The RTM maps every SOP requirement to features, modules, tests and evidence. It is updated at every stage gate. Status values:
 

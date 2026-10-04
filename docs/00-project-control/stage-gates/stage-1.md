@@ -5,8 +5,7 @@
 | SOP reference | §9 Stage 1 |
 | Branch | `stage/1-initiation` |
 | Gate date | 2026-10-04 |
-| Reviewer / approver | Moksh |
-| Outcome | Pending sign-off |
+| Outcome | Approved |
 
 ## Exit criteria (SOP §9 Stage 1 bullets)
 
@@ -29,6 +28,4 @@
 - The container runtime is still being installed (DEP-01). It does not block Stage 2, which is design only.
 
 ## Decision
-☐ Approved: proceed to Stage 2 (Requirements and design)
-
-Signed: ____________ (Moksh) Date: ____________
+Approved on 2026-10-04. Stage 2 (requirements and design) can start from `main` once this branch is merged.

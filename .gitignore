@@ -35,6 +35,7 @@ dist/
 # --- Runtime artefacts ---
 ops/backups/
 ops/bundles/
+ops/demo-credentials.txt
 migration/output/
 migration/samples/*.xlsx
 outbox/

@@ -90,3 +90,16 @@ def test_nfr02_logout_revokes_refresh_token(client, db_session):
         client.post("/api/v1/auth/refresh", json={"refresh_token": tokens["refresh_token"]}).status_code
         == 401
     )
+
+
+def test_nfr02_login_attempts_are_audited_without_username(client, db_session):
+    from sqlalchemy import select
+
+    from app.db.models import AuditLog
+
+    make_staff(db_session, "Librarian", username="lib4")
+    _login(client, "lib4")
+    _login(client, "lib4", "wrong")
+    rows = db_session.scalars(select(AuditLog).where(AuditLog.action.like("auth.login.%"))).all()
+    assert {r.action for r in rows} == {"auth.login.success", "auth.login.failure"}
+    assert all("lib4" not in str(r.details) for r in rows)

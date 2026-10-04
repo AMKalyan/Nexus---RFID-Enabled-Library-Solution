@@ -2,8 +2,10 @@ from fastapi import APIRouter, Depends, Request
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy.orm import Session
 
+from app.core.audit import audit
 from app.core.auth import Principal, get_principal
 from app.core.config import get_settings
+from app.core.errors import AppError
 from app.core.ratelimit import limiter
 from app.core.security import revoke_refresh_token, rotate_refresh_token
 from app.db.base import get_session
@@ -40,8 +42,33 @@ class MeOut(BaseModel):
 @router.post("/login", response_model=TokensOut)
 @limiter.limit(get_settings().rate_limit_auth)
 def login(request: Request, body: LoginIn, session: Session = Depends(get_session)) -> dict:
-    typ, sub, role = authenticate_password(session, body.username, body.password)
+    ip = request.client.host if request.client else None
+    try:
+        typ, sub, role = authenticate_password(session, body.username, body.password)
+    except AppError:
+        session.rollback()
+        # Never record the attempted username: it may be a mistyped password.
+        audit(
+            session,
+            actor_type="external",
+            actor_id=None,
+            action="auth.login.failure",
+            entity_type="session",
+            details={"username_length": len(body.username)},
+            ip=ip,
+        )
+        session.commit()
+        raise
     tokens = issue_tokens(session, typ, sub, role)
+    audit(
+        session,
+        actor_type="staff" if typ == "staff" else "member",
+        actor_id=sub,
+        action="auth.login.success",
+        entity_type="session",
+        details={"method": "password"},
+        ip=ip,
+    )
     session.commit()
     return tokens
 
@@ -57,9 +84,16 @@ def refresh(request: Request, body: RefreshIn, session: Session = Depends(get_se
 
 @router.post("/logout", status_code=204)
 def logout(
-    body: RefreshIn, session: Session = Depends(get_session), _: Principal = Depends(get_principal)
+    body: RefreshIn, session: Session = Depends(get_session), principal: Principal = Depends(get_principal)
 ) -> None:
     revoke_refresh_token(session, body.refresh_token)
+    audit(
+        session,
+        actor_type="staff" if principal.typ == "staff" else "member",
+        actor_id=principal.id,
+        action="auth.logout",
+        entity_type="session",
+    )
     session.commit()
 
 

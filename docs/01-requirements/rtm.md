@@ -1,6 +1,6 @@
 # Requirements Traceability Matrix (RTM)
 
-Version 0.1 (Stage 1 baseline).
+Version 0.2 (Stage 2 design baseline).
 
 The RTM maps every SOP requirement to features, modules, tests and evidence. It is updated at every stage gate. Status values:
 
@@ -63,8 +63,8 @@ Module and test columns are filled in from Stage 2 (design) and Stage 7 (verific
 
 | ID | Deliverable | Location | SOP stage | Status |
 |---|---|---|---|---|
-| D1 | Requirements package | `docs/01-requirements/` | 1–2 | In progress |
-| D2 | Architecture package | `docs/02-design/` | 2 | Planned |
+| D1 | Requirements package | `docs/01-requirements/` | 1–2 | Done |
+| D2 | Architecture package | `docs/02-design/` | 2 | Done |
 | D3 | Working prototype | `backend/`, `frontend/`, `device-sim/` | 3–5 | Planned |
 | D4 | Source repository | repo root, `docs/04-repository/` | 1–7 | In progress |
 | D5 | Database & migration | `backend/app/db/`, `migration/`, `docs/05-data-migration/` | 3, 6 | Planned |
@@ -78,3 +78,4 @@ Module and test columns are filled in from Stage 2 (design) and Stage 7 (verific
 | Version | Date | Change |
 |---|---|---|
 | 0.1 | 2026-10-04 | Baseline built from the SOP during Stage 1 |
+| 0.2 | 2026-10-04 | Design complete: module mapping confirmed; D1 and D2 done; acquisition/serials/net-cataloguing scope notes per ADR-0004 |

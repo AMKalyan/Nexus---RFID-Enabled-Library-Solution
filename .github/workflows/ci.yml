@@ -1,0 +1,40 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  backend:
+    runs-on: ubuntu-24.04
+    services:
+      db:
+        image: postgres:16.4-alpine
+        env:
+          POSTGRES_USER: nexus_owner
+          POSTGRES_PASSWORD: devowner
+          POSTGRES_DB: nexus
+        ports: ["5433:5432"]
+        options: >-
+          --health-cmd "pg_isready -U nexus_owner" --health-interval 5s --health-retries 20
+    env:
+      DATABASE_URL: postgresql+psycopg://nexus_app:devapp@localhost:5433/nexus
+      OWNER_DATABASE_URL: postgresql+psycopg://nexus_owner:devowner@localhost:5433/nexus
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - name: Create database roles
+        run: |
+          PGPASSWORD=devowner psql -h localhost -p 5433 -U nexus_owner -d nexus \
+            -c "CREATE ROLE nexus_app LOGIN PASSWORD 'devapp'" \
+            -c "CREATE ROLE nexus_readonly LOGIN PASSWORD 'devreadonly'" \
+            -c "CREATE ROLE legacy_owner NOLOGIN"
+      - uses: actions/setup-node@v4
+        with: { node-version: "22" }
+      - run: python -m venv .venv && .venv/bin/pip install -r requirements-dev.txt
+      - run: npm ci --prefix ../frontend
+      - run: bash ../ops/ci-local.sh

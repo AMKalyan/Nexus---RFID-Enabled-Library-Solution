@@ -1,6 +1,6 @@
 # Requirements Traceability Matrix (RTM)
 
-Version 0.2 (Stage 2 design baseline).
+Version 0.3 (Stage 3 foundation build).
 
 The RTM maps every SOP requirement to features, modules, tests and evidence. It is updated at every stage gate. Status values:
 
@@ -34,13 +34,13 @@ Module and test columns are filled in from Stage 2 (design) and Stage 7 (verific
 
 | Req | Area | Requirement (summary) | How it is met | Evidence (planned) | Status |
 |---|---|---|---|---|---|
-| NFR 01 | Data integrity | Back up existing DB before integration; never modify/delete/corrupt existing records | `legacy_ilms` schema read-only via DB grants; mandatory backup before migration/update; checksum integrity tool | `ops/integrity.py` before/after report; AC 10 test | Planned |
-| NFR 02 | Security & privacy | Least privilege, secure secrets, audit logging, input validation, encrypted transport | Engineering standards §2; RBAC; argon2; JWT; audit log; TLS proxy; masked logs | Security test suite, bandit/pip-audit reports | Planned |
+| NFR 01 | Data integrity | Back up existing DB before integration; never modify/delete/corrupt existing records | `legacy_ilms` schema read-only via DB grants; mandatory backup before migration/update; checksum integrity tool | `ops/integrity.py` before/after report; AC 10 test; **Stage 3:** `test_nfr01_app_role_cannot_modify_legacy` (4 cases), `test_nfr01_mirror_copies_without_touching_legacy` | In progress |
+| NFR 02 | Security & privacy | Least privilege, secure secrets, audit logging, input validation, encrypted transport | Engineering standards §2; RBAC; argon2; JWT; audit log; TLS proxy; masked logs | Security test suite, bandit/pip-audit reports; **Stage 3:** 18 auth, token, audit, masking and error tests (see `docs/06-testing/baseline-test-report.md`) | In progress |
 | NFR 03 | Compatibility | Windows 11 clients, Windows Server 2022+, Ethernet, isolated-site deployment | Browser-based client; Docker Compose host; offline bundle; documented Windows Server notes | Deployment guide, environment checklist | Planned |
-| NFR 04 | Licensing | Identify dependencies & licences; pin versions; document offline/redistribution restrictions | Lockfiles, SBOM, licence inventory | `docs/04-repository/sbom-and-licences.md` | Planned |
+| NFR 04 | Licensing | Identify dependencies & licences; pin versions; document offline/redistribution restrictions | Lockfiles, SBOM, licence inventory | `docs/04-repository/sbom-and-licences.md`; **Stage 3:** exact pins in `requirements*.txt` and `package-lock.json`; pip-audit and npm audit clean | In progress |
 | NFR 05 | Testability | Functional, integration, performance, migration, security, regression, UAT evidence | pytest suites per type, acceptance tests per AC, perf script, UAT checklist | `docs/06-testing/` | Planned |
-| NFR 06 | Maintainability | Modular adapters, external config, structured logs, versioned migrations, documented builds, rollback | Adapter interfaces, `.env` config, JSON logs, Alembic, build docs, rollback scripts | Architecture package, ops scripts | Planned |
-| NFR 07 | Supportability | Diagnostics, health checks, structured logs, runbooks | `/health`, `/version`, device heartbeat, JSON logs with correlation IDs, runbook | `docs/08-operations/runbook.md` | Planned |
+| NFR 06 | Maintainability | Modular adapters, external config, structured logs, versioned migrations, documented builds, rollback | Adapter interfaces, `.env` config, JSON logs, Alembic, build docs, rollback scripts | Architecture package, ops scripts; **Stage 3:** adapter registry, `.env` configuration, JSON logs, Alembic 0001–0002 with downgrade, `test_adr0003_no_raw_sql_in_application_code` | In progress |
+| NFR 07 | Supportability | Diagnostics, health checks, structured logs, runbooks | `/health`, `/version`, device heartbeat, JSON logs with correlation IDs, runbook | `docs/08-operations/runbook.md`; **Stage 3:** `/api/v1/health` (database check), `/api/v1/version` (migration revision), `test_nfr07_*` | In progress |
 | NFR 08 | Documentation | Architecture, device config, IP/interface details, API docs, versions, install, admin, user, troubleshooting | Documentation packages D2, D7, D8 | `docs/` | Planned |
 | NFR 09 | Delivery | Complete D0–D10; identify all remaining production work | SOP stage gates, production-completion backlog | `docs/09-demo/production-backlog.md` | Planned |
 
@@ -65,10 +65,10 @@ Module and test columns are filled in from Stage 2 (design) and Stage 7 (verific
 |---|---|---|---|---|
 | D1 | Requirements package | `docs/01-requirements/` | 1–2 | Done |
 | D2 | Architecture package | `docs/02-design/` | 2 | Done |
-| D3 | Working prototype | `backend/`, `frontend/`, `device-sim/` | 3–5 | Planned |
+| D3 | Working prototype | `backend/`, `frontend/`, `device-sim/` | 3–5 | In progress |
 | D4 | Source repository | repo root, `docs/04-repository/` | 1–7 | In progress |
-| D5 | Database & migration | `backend/app/db/`, `migration/`, `docs/05-data-migration/` | 3, 6 | Planned |
-| D6 | Test package | `backend/tests/`, `docs/06-testing/` | 3–7 | Planned |
+| D5 | Database & migration | `backend/app/db/`, `migration/`, `docs/05-data-migration/` | 3, 6 | In progress |
+| D6 | Test package | `backend/tests/`, `docs/06-testing/` | 3–7 | In progress |
 | D7 | Deployment package | `ops/`, `docs/07-deployment/` | Release | Planned |
 | D8 | Operational documentation | `docs/08-operations/` | Release | Planned |
 | D9 | Demonstration | `docs/09-demo/` | Release | Planned |
@@ -79,3 +79,4 @@ Module and test columns are filled in from Stage 2 (design) and Stage 7 (verific
 |---|---|---|
 | 0.1 | 2026-10-04 | Baseline built from the SOP during Stage 1 |
 | 0.2 | 2026-10-04 | Design complete: module mapping confirmed; D1 and D2 done; acquisition/serials/net-cataloguing scope notes per ADR-0004 |
+| 0.3 | 2026-10-05 | Foundation build: NFR 01, 02, 04, 06, 07 in progress with test evidence; D3–D6 in progress |

@@ -41,3 +41,5 @@ migration/samples/*.xlsx
 outbox/
 logs/
 *.log
+ops/nginx/certs/
+backend/reports/

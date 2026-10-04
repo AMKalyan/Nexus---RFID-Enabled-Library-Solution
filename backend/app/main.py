@@ -1,12 +1,31 @@
+import logging
+
+from alembic.runtime.migration import MigrationContext
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from slowapi.errors import RateLimitExceeded
+from sqlalchemy import select
 
 from app.api.v1 import auth, health
 from app.core.config import get_settings
 from app.core.errors import install_error_handlers
 from app.core.logging import configure_logging
 from app.core.ratelimit import limiter
+from app.db.base import engine
+
+log = logging.getLogger("nexus.health")
+
+
+def _database_check(app: FastAPI) -> tuple[str, bool]:
+    try:
+        with engine.connect() as conn:
+            conn.execute(select(1))
+            ctx = MigrationContext.configure(conn, opts={"version_table_schema": "nexus"})
+            app.state.alembic_rev = ctx.get_current_revision()
+        return "database", True
+    except Exception:  # noqa: BLE001 - any failure means unhealthy; details go to the log only
+        log.exception("database health check failed")
+        return "database", False
 
 
 def create_app(check_db: bool = True) -> FastAPI:
@@ -20,6 +39,9 @@ def create_app(check_db: bool = True) -> FastAPI:
     )
     app.state.limiter = limiter
     app.state.health_checks = []
+    if check_db:
+        app.state.health_checks.append(lambda: _database_check(app))
+        _database_check(app)
     install_error_handlers(app)
 
     @app.exception_handler(RateLimitExceeded)

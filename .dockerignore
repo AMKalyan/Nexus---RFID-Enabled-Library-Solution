@@ -1,0 +1,14 @@
+**/node_modules
+**/.venv
+**/__pycache__
+**/.pytest_cache
+**/.mypy_cache
+**/.ruff_cache
+frontend/dist
+.git
+.env
+ops/backups
+ops/bundles
+ops/nginx/certs
+ops/demo-credentials.txt
+outbox

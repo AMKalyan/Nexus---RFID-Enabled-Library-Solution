@@ -125,7 +125,7 @@ def seed_legacy(conn: Connection, n_bibs: int = 2000, n_borrowers: int = 300) ->
     """Insert synthetic legacy records as legacy_owner. The caller commits."""
     fake = Faker("en_IN")
     fake.seed_instance(SEED)
-    r = random.Random(SEED)  # noqa: S311  (reproducible synthetic data, not secrets)
+    r = random.Random(SEED)  # noqa: S311  # nosec B311 - reproducible synthetic data, not secrets
 
     bibs, accessions, borrowers = [], [], []
     acc_counter = 0
@@ -260,7 +260,7 @@ def mirror_legacy(session: Session) -> dict[str, int]:
 
 def seed_demo(session: Session) -> dict[str, str]:
     """Shelves, devices, staff, tags and some activity. Returns generated credentials."""
-    r = random.Random(SEED)  # noqa: S311  (reproducible synthetic data, not secrets)
+    r = random.Random(SEED)  # noqa: S311  # nosec B311 - reproducible synthetic data, not secrets
     creds: dict[str, str] = {}
 
     for code, name, lo, hi in SHELVES:

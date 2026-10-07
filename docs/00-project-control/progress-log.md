@@ -11,7 +11,7 @@ A running record of delivery against the SOP §9 stages. It is updated at every 
 | 3 Foundation build | Day 1 (2026-10-04) | 2026-10-05 | `sop-stage-3` |
 | 4 Core library functions | Day 2 (2026-10-05) AM | 2026-10-07 | `sop-stage-4` |
 | 5 RFID middleware & integrations | Day 2 midday | 2026-10-07 | `sop-stage-5` |
-| 6 Migration & resilience | Day 2 afternoon | — | `sop-stage-6` |
+| 6 Migration & resilience | Day 2 afternoon | 2026-10-07 | `sop-stage-6` |
 | 7 Verification | Day 2 evening | — | `sop-stage-7` |
 | Release & handover (D9–D10) | Day 2 evening | — | `v1.0.0-eval` |
 
@@ -53,6 +53,6 @@ A running record of delivery against the SOP §9 stages. It is updated at every 
 
 - Stage 6 Tasks 21–24: synthetic 20k export generator and profiler; staged spreadsheet migration with validation, duplicate detection, reconciliation and batch rollback; verified backup, restore and legacy integrity checksums; D5 package. 214 backend (91% coverage), 6 simulator, 5 migration-tool and 8 frontend tests passing.
 - Live 20k run reconciled exactly against the generator manifest; batch rollback and restore rehearsed on the stack with legacy data IDENTICAL (`docs/05-data-migration/`). DEF-005 and DEF-006 closed.
-- Stage 6 gate record written; awaiting approval.
+- Stage 6 gate approved, merged and tagged `sop-stage-6`.
 
-**Next task:** Stage 6 gate approval, then Task 25 of `implementation-plan.md` (full verification run and test-to-requirement matrix) on `stage/7-verification`.
+**Next task:** Task 25 of `implementation-plan.md` (full verification run and test-to-requirement matrix) on `stage/7-verification`.

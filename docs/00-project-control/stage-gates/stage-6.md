@@ -5,7 +5,7 @@
 | SOP reference | §9 Stage 6 |
 | Branch | `stage/6-migration` |
 | Gate date | 2026-10-07 |
-| Outcome | Pending approval |
+| Outcome | Approved |
 
 ## Exit criteria (SOP §9 Stage 6 bullets)
 
@@ -36,4 +36,4 @@ All of these pass. ruff, mypy, bandit, pip-audit and npm audit are clean (`bash 
 - **Process:** formatting run from the repository root ignored the backend's ruff settings. Those changes were discarded before commit, and backend lint is run from `backend/`.
 
 ## Decision
-Pending approval. Verification (Stage 7) starts from `main` once this branch is merged.
+Approved on 2026-10-07. Verification (Stage 7) starts from `main` once this branch is merged.

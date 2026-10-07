@@ -6,12 +6,26 @@ from fastapi.responses import JSONResponse
 from slowapi.errors import RateLimitExceeded
 from sqlalchemy import select
 
-from app.api.v1 import admin, auth, catalog, circulation, devices, fines, health, members, opac, reports, ws
+from app.api.v1 import (
+    admin,
+    auth,
+    catalog,
+    circulation,
+    devices,
+    fines,
+    health,
+    members,
+    opac,
+    reports,
+    tags,
+    ws,
+)
 from app.core.config import get_settings
 from app.core.errors import install_error_handlers
 from app.core.logging import configure_logging
 from app.core.ratelimit import limiter
 from app.db.base import engine
+from app.middleware_rfid import handlers as _event_handlers  # noqa: F401  (registers device event handlers)
 
 log = logging.getLogger("nexus.health")
 
@@ -58,6 +72,7 @@ def create_app(check_db: bool = True) -> FastAPI:
     app.include_router(admin.router, prefix="/api/v1")
     app.include_router(reports.router, prefix="/api/v1")
     app.include_router(devices.router, prefix="/api/v1")
+    app.include_router(tags.router, prefix="/api/v1")
     app.include_router(ws.router, prefix="/api/v1")
     return app
 

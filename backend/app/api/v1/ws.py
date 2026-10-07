@@ -5,6 +5,7 @@ from app.core.auth import principal_from_token
 from app.core.errors import AppError
 from app.db.base import get_session
 from app.middleware_rfid.live_hub import hub
+from app.services.smartcard import challenges
 
 router = APIRouter(tags=["live"])
 
@@ -35,6 +36,26 @@ async def live(websocket: WebSocket, session: Session = Depends(get_session)) ->
     try:
         while True:
             await websocket.send_json(await sub.queue.get())
+    except WebSocketDisconnect:
+        pass
+    finally:
+        hub.unsubscribe(sub)
+
+
+@router.websocket("/ws/card")
+async def card_wait(websocket: WebSocket) -> None:
+    """Unauthenticated: lets the login page learn when its own challenge has been tapped. Only messages for
+    that challenge id are delivered, and they carry no identity."""
+    reader = websocket.query_params.get("reader", "")
+    challenge_id = websocket.query_params.get("challenge_id", "")
+    if not challenges.exists(reader, challenge_id):
+        await websocket.close(code=4404)
+        return
+    await websocket.accept()
+    sub = hub.subscribe({"auth.card"}, match={"reader_code": reader, "challenge_id": challenge_id})
+    try:
+        await websocket.send_json(await sub.queue.get())
+        await websocket.close()
     except WebSocketDisconnect:
         pass
     finally:

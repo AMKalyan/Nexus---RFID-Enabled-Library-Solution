@@ -66,3 +66,30 @@ def test_nfr02_live_feed_rejects_deactivated_user(client, db_session):
     db_session.flush()
     with pytest.raises(WebSocketDisconnect), client.websocket_connect(f"/api/v1/ws/live?token={token}") as ws:
         ws.receive_json()
+
+
+def test_ac07_card_socket_notifies_waiting_login_page(client, db_session, device_card, device_event):
+    from tests.factories import make_staff
+
+    make_staff(db_session, "Librarian", smartcard_uid="04EEEEEE")
+    challenge = client.post("/api/v1/auth/smartcard/challenge", json={"reader_code": device_card.code}).json()
+    cid = challenge["challenge_id"]
+    with client.websocket_connect(f"/api/v1/ws/card?reader={device_card.code}&challenge_id={cid}") as ws:
+        body = device_event("CardTapped", device_type="smartcard_reader", card_uid="04EEEEEE")
+        client.post(
+            f"/api/v1/devices/{device_card.code}/events",
+            json=body,
+            headers={"X-Device-Key": device_card.raw_key},
+        )
+        msg = ws.receive_json()
+    assert msg["data"] == {"reader_code": device_card.code, "challenge_id": cid, "ok": True}
+
+
+def test_nfr02_card_socket_rejects_unknown_challenge(client, device_card):
+    with (
+        pytest.raises(WebSocketDisconnect),
+        client.websocket_connect(
+            f"/api/v1/ws/card?reader={device_card.code}&challenge_id=forged-challenge-id"
+        ) as ws,
+    ):
+        ws.receive_json()

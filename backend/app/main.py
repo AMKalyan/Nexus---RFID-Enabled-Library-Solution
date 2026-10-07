@@ -20,6 +20,7 @@ from app.api.v1 import (
     health,
     inventory,
     members,
+    migration,
     opac,
     reports,
     tags,
@@ -95,6 +96,7 @@ def create_app(check_db: bool = True) -> FastAPI:
     app.include_router(tags.router, prefix="/api/v1")
     app.include_router(inventory.router, prefix="/api/v1")
     app.include_router(gate.router, prefix="/api/v1")
+    app.include_router(migration.router, prefix="/api/v1")
     app.include_router(ws.router, prefix="/api/v1")
     return app
 

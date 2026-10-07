@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from app.core.config import get_settings
 from app.core.errors import AppError
 from app.integrations.camera_mock import MockCamera
+from app.integrations.credentials_mock import MockCredentialProvider
 from app.integrations.legacy_db import DbLegacyConnector
 from app.integrations.notify_mock import MockEmail, MockPrint, MockSms
 
@@ -19,6 +20,7 @@ _FACTORIES: dict[str, dict[str, Factory]] = {
     "sms": {"mock": lambda _s: MockSms()},
     "print": {"mock": lambda _s: MockPrint()},
     "camera": {"mock": lambda _s: MockCamera()},
+    "credentials": {"mock": lambda s: MockCredentialProvider(s)},  # type: ignore[arg-type]
 }
 
 

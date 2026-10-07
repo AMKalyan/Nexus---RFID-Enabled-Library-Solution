@@ -6,6 +6,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.core.errors import AppError
+from app.core.logging import mask_mapping
 from app.db.models import Device, DeviceEvent
 from app.middleware_rfid.dispatcher import dispatcher
 from app.middleware_rfid.schemas import DeviceEventIn
@@ -27,7 +28,8 @@ def ingest(session: Session, device: Device, event: DeviceEventIn) -> tuple[str,
         event_id=event.event_id,
         device_code=device.code,
         event_type=event.type,
-        payload={**event.payload, "epcs": event.epcs},
+        # Card UIDs and other personal values are masked before the event is stored.
+        payload={**mask_mapping(event.payload), "epcs": event.epcs},
         occurred_at=event.occurred_at,
     )
     try:

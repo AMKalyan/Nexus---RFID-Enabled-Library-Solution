@@ -396,3 +396,22 @@ def device_event():
         }
 
     return build
+
+
+@pytest.fixture
+def shelf_world(db_session):
+    """Six tagged items on A-01 and three on B-01; exposes their EPCs and items."""
+    from types import SimpleNamespace
+
+    from tests.factories import make_bib, make_item, make_tag
+
+    def stock(shelf, n):
+        items = [
+            make_item(db_session, make_bib(db_session, title=f"{shelf} book {i}"), shelf_code=shelf)
+            for i in range(n)
+        ]
+        return items, [make_tag(db_session, item).epc for item in items]
+
+    a_items, a_epcs = stock("A-01", 6)
+    b_items, b_epcs = stock("B-01", 3)
+    return SimpleNamespace(a01_items=a_items, a01_epcs=a_epcs, b01_items=b_items, b01_epcs=b_epcs)

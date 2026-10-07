@@ -51,6 +51,7 @@ from app.db.models import (
     TagTarget,
 )
 from app.integrations.legacy_db import DbLegacyConnector
+from app.services.validation import isbn13_valid  # noqa: F401  (re-exported for tests)
 
 SEED = 42
 CREDENTIALS_FILE = Path(__file__).resolve().parents[3] / "ops" / "demo-credentials.txt"
@@ -98,12 +99,6 @@ def isbn13(r: random.Random) -> str:
     digits = [9, 7, 8] + [r.randint(0, 9) for _ in range(9)]
     check = (10 - sum(d * (3 if i % 2 else 1) for i, d in enumerate(digits)) % 10) % 10
     return "".join(map(str, [*digits, check]))
-
-
-def isbn13_valid(isbn: str) -> bool:
-    if len(isbn) != 13 or not isbn.isdigit():
-        return False
-    return sum(int(d) * (3 if i % 2 else 1) for i, d in enumerate(isbn)) % 10 == 0
 
 
 def shelf_for_call_no(call_no: str | None) -> str | None:

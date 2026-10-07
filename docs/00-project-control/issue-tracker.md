@@ -26,7 +26,9 @@ Status values: Open, In progress, Done, Deferred.
 | NX-021 | Upgrade vulnerable backend dependencies (DEF-001) | stage-3, defect, NFR-02 | Stage 3 | Done | Stage 3 merge |
 | NX-022 | Audit details database default (DEF-002) | stage-3, defect | Stage 3 | Done | Stage 3 merge |
 | NX-023 | Upgrade vulnerable frontend dependencies (DEF-003) | stage-3, defect, NFR-02 | Stage 3 | Done | Stage 3 merge |
-| NX-030 | Core library functions | stage-4, FR-01, FR-02, FR-04, FR-08 | Stage 4 | Open | |
+| NX-030 | Core library functions | stage-4, FR-01, FR-02, FR-04, FR-08 | Stage 4 | Done | Stage 4 merge |
+| NX-031 | Administration API and screens | stage-4, FR-11 | Stage 4 | Done | Stage 4 merge |
+| NX-032 | Charting library deprecation warnings (DEF-004) | stage-4, defect | Stage 4 | Done | Stage 4 merge |
 | NX-040 | RFID middleware and integrations | stage-5, FR-03, FR-05, FR-06, FR-07, FR-09 | Stage 5 | Open | |
 | NX-050 | Migration and resilience | stage-6, FR-10, NFR-01 | Stage 6 | Open | |
 | NX-060 | Verification | stage-7, NFR-05 | Stage 7 | Open | |

@@ -3,7 +3,7 @@ import { LogOut } from "lucide-react";
 import { NavLink, Outlet } from "react-router-dom";
 import { api } from "../api/client";
 import { useAuth } from "../auth/AuthContext";
-import { NAV } from "./nav";
+import { visibleNav } from "./nav";
 
 export function Layout() {
   const { user, permissions, logout } = useAuth();
@@ -11,7 +11,7 @@ export function Layout() {
     queryKey: ["version"],
     queryFn: () => api<{ version: string }>("/version"),
   });
-  const items = NAV.filter((n) => permissions.has(n.perm));
+  const items = visibleNav(permissions, user?.typ);
 
   return (
     <div className="flex min-h-screen">
@@ -22,7 +22,7 @@ export function Layout() {
             <NavLink
               key={path}
               to={path}
-              end={path === "/"}
+              end
               className={({ isActive }) =>
                 `flex items-center gap-3 rounded-md px-3 py-2 text-sm ${
                   isActive ? "bg-indigo-50 text-indigo-700" : "text-slate-600 hover:bg-slate-100"

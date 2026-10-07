@@ -464,6 +464,63 @@
         "title": "BibPatch",
         "type": "object"
       },
+      "CardLoginIn": {
+        "additionalProperties": false,
+        "properties": {
+          "challenge_id": {
+            "maxLength": 64,
+            "minLength": 10,
+            "title": "Challenge Id",
+            "type": "string"
+          },
+          "reader_code": {
+            "maxLength": 20,
+            "minLength": 1,
+            "title": "Reader Code",
+            "type": "string"
+          }
+        },
+        "required": [
+          "reader_code",
+          "challenge_id"
+        ],
+        "title": "CardLoginIn",
+        "type": "object"
+      },
+      "ChallengeIn": {
+        "additionalProperties": false,
+        "properties": {
+          "reader_code": {
+            "maxLength": 20,
+            "minLength": 1,
+            "title": "Reader Code",
+            "type": "string"
+          }
+        },
+        "required": [
+          "reader_code"
+        ],
+        "title": "ChallengeIn",
+        "type": "object"
+      },
+      "ChallengeOut": {
+        "properties": {
+          "challenge_id": {
+            "title": "Challenge Id",
+            "type": "string"
+          },
+          "expires_in": {
+            "title": "Expires In",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "challenge_id",
+          "expires_in"
+        ],
+        "title": "ChallengeOut",
+        "type": "object"
+      },
       "CheckinOut": {
         "properties": {
           "fine": {
@@ -509,6 +566,26 @@
           "item"
         ],
         "title": "CheckoutIn",
+        "type": "object"
+      },
+      "CommandAckIn": {
+        "additionalProperties": false,
+        "properties": {
+          "command_id": {
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Command Id",
+            "type": "string"
+          },
+          "response": {
+            "title": "Response",
+            "type": "object"
+          }
+        },
+        "required": [
+          "command_id"
+        ],
+        "title": "CommandAckIn",
         "type": "object"
       },
       "DashboardOut": {
@@ -608,6 +685,276 @@
         ],
         "title": "DayCount",
         "type": "object"
+      },
+      "DeviceCreatedOut": {
+        "properties": {
+          "api_key": {
+            "title": "Api Key",
+            "type": "string"
+          },
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "config": {
+            "title": "Config",
+            "type": "object"
+          },
+          "device_type": {
+            "$ref": "#/components/schemas/DeviceType"
+          },
+          "ip_address": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ip Address"
+          },
+          "last_heartbeat_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Heartbeat At"
+          },
+          "location": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "online",
+              "offline"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "device_type",
+          "name",
+          "location",
+          "ip_address",
+          "config",
+          "status",
+          "last_heartbeat_at",
+          "api_key"
+        ],
+        "title": "DeviceCreatedOut",
+        "type": "object"
+      },
+      "DeviceEventIn": {
+        "additionalProperties": false,
+        "description": "Envelope for every device event (interface design \u00a72.2).",
+        "properties": {
+          "device_type": {
+            "$ref": "#/components/schemas/DeviceType"
+          },
+          "epcs": {
+            "items": {
+              "pattern": "^[0-9A-F]{8,32}$",
+              "type": "string"
+            },
+            "maxItems": 500,
+            "title": "Epcs",
+            "type": "array"
+          },
+          "event_id": {
+            "format": "uuid",
+            "title": "Event Id",
+            "type": "string"
+          },
+          "occurred_at": {
+            "format": "date-time",
+            "title": "Occurred At",
+            "type": "string"
+          },
+          "payload": {
+            "title": "Payload",
+            "type": "object"
+          },
+          "type": {
+            "enum": [
+              "Heartbeat",
+              "TagsRead",
+              "GatePassage",
+              "CardTapped",
+              "Footfall"
+            ],
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "event_id",
+          "device_type",
+          "type",
+          "occurred_at"
+        ],
+        "title": "DeviceEventIn",
+        "type": "object"
+      },
+      "DeviceIn": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "maxLength": 20,
+            "minLength": 2,
+            "pattern": "^[A-Z0-9-]+$",
+            "title": "Code",
+            "type": "string"
+          },
+          "config": {
+            "title": "Config",
+            "type": "object"
+          },
+          "device_type": {
+            "$ref": "#/components/schemas/DeviceType"
+          },
+          "ip_address": {
+            "anyOf": [
+              {
+                "maxLength": 45,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ip Address"
+          },
+          "location": {
+            "anyOf": [
+              {
+                "maxLength": 100,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location"
+          },
+          "name": {
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "device_type",
+          "name"
+        ],
+        "title": "DeviceIn",
+        "type": "object"
+      },
+      "DeviceOut": {
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "config": {
+            "title": "Config",
+            "type": "object"
+          },
+          "device_type": {
+            "$ref": "#/components/schemas/DeviceType"
+          },
+          "ip_address": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ip Address"
+          },
+          "last_heartbeat_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Heartbeat At"
+          },
+          "location": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "online",
+              "offline"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "device_type",
+          "name",
+          "location",
+          "ip_address",
+          "config",
+          "status",
+          "last_heartbeat_at"
+        ],
+        "title": "DeviceOut",
+        "type": "object"
+      },
+      "DeviceType": {
+        "enum": [
+          "staff_station",
+          "handheld",
+          "gate",
+          "smartcard_reader",
+          "printer",
+          "camera"
+        ],
+        "title": "DeviceType",
+        "type": "string"
       },
       "DueOut": {
         "properties": {
@@ -734,6 +1081,91 @@
         ],
         "title": "FineStatus",
         "type": "string"
+      },
+      "GateEventOut": {
+        "properties": {
+          "accession_no": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accession No"
+          },
+          "alarm": {
+            "title": "Alarm",
+            "type": "boolean"
+          },
+          "authorised": {
+            "title": "Authorised",
+            "type": "boolean"
+          },
+          "device_code": {
+            "title": "Device Code",
+            "type": "string"
+          },
+          "direction": {
+            "title": "Direction",
+            "type": "string"
+          },
+          "epc": {
+            "title": "Epc",
+            "type": "string"
+          },
+          "has_photo": {
+            "title": "Has Photo",
+            "type": "boolean"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "item_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Item Id"
+          },
+          "notified": {
+            "title": "Notified",
+            "type": "boolean"
+          },
+          "occurred_at": {
+            "format": "date-time",
+            "title": "Occurred At",
+            "type": "string"
+          },
+          "offline_decision": {
+            "title": "Offline Decision",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "device_code",
+          "epc",
+          "item_id",
+          "accession_no",
+          "direction",
+          "authorised",
+          "alarm",
+          "offline_decision",
+          "notified",
+          "has_photo",
+          "occurred_at"
+        ],
+        "title": "GateEventOut",
+        "type": "object"
       },
       "HTTPValidationError": {
         "properties": {
@@ -1632,6 +2064,97 @@
         "title": "OpacPage",
         "type": "object"
       },
+      "OutboxOut": {
+        "properties": {
+          "attempts": {
+            "title": "Attempts",
+            "type": "integer"
+          },
+          "channel": {
+            "title": "Channel",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "last_error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Error"
+          },
+          "recipient": {
+            "title": "Recipient",
+            "type": "string"
+          },
+          "sent_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sent At"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "subject": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subject"
+          },
+          "template": {
+            "title": "Template",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "channel",
+          "recipient",
+          "template",
+          "subject",
+          "status",
+          "attempts",
+          "last_error",
+          "created_at",
+          "sent_at"
+        ],
+        "title": "OutboxOut",
+        "type": "object"
+      },
+      "OutboxStatus": {
+        "enum": [
+          "queued",
+          "sent",
+          "failed"
+        ],
+        "title": "OutboxStatus",
+        "type": "string"
+      },
       "PolicyOut": {
         "properties": {
           "can_borrow_reference": {
@@ -1969,6 +2492,151 @@
         "title": "ShelfSpine",
         "type": "object"
       },
+      "StartIn": {
+        "additionalProperties": false,
+        "properties": {
+          "device_code": {
+            "maxLength": 20,
+            "minLength": 1,
+            "title": "Device Code",
+            "type": "string"
+          },
+          "shelf_code": {
+            "maxLength": 20,
+            "minLength": 1,
+            "title": "Shelf Code",
+            "type": "string"
+          }
+        },
+        "required": [
+          "shelf_code",
+          "device_code"
+        ],
+        "title": "StartIn",
+        "type": "object"
+      },
+      "TagDetailOut": {
+        "properties": {
+          "encoded_at": {
+            "format": "date-time",
+            "title": "Encoded At",
+            "type": "string"
+          },
+          "epc": {
+            "title": "Epc",
+            "type": "string"
+          },
+          "item": {
+            "anyOf": [
+              {
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Item"
+          },
+          "member": {
+            "anyOf": [
+              {
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Member"
+          },
+          "retire_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Retire Reason"
+          },
+          "retired_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Retired At"
+          },
+          "security_bit": {
+            "title": "Security Bit",
+            "type": "boolean"
+          },
+          "status": {
+            "$ref": "#/components/schemas/TagStatus"
+          },
+          "target_type": {
+            "$ref": "#/components/schemas/TagTarget"
+          }
+        },
+        "required": [
+          "epc",
+          "status",
+          "security_bit",
+          "encoded_at",
+          "retired_at",
+          "retire_reason",
+          "target_type"
+        ],
+        "title": "TagDetailOut",
+        "type": "object"
+      },
+      "TagIn": {
+        "additionalProperties": false,
+        "properties": {
+          "epc": {
+            "pattern": "^[0-9A-Fa-f]{8,32}$",
+            "title": "Epc",
+            "type": "string"
+          },
+          "item_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Item Id"
+          },
+          "member_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Member Id"
+          },
+          "target_type": {
+            "$ref": "#/components/schemas/TagTarget"
+          }
+        },
+        "required": [
+          "epc",
+          "target_type"
+        ],
+        "title": "TagIn",
+        "type": "object"
+      },
       "TagOut": {
         "properties": {
           "encoded_at": {
@@ -2028,6 +2696,14 @@
           "retired"
         ],
         "title": "TagStatus",
+        "type": "string"
+      },
+      "TagTarget": {
+        "enum": [
+          "item",
+          "member"
+        ],
+        "title": "TagTarget",
         "type": "string"
       },
       "TitleCount": {
@@ -2927,6 +3603,88 @@
         ]
       }
     },
+    "/api/v1/auth/smartcard": {
+      "post": {
+        "operationId": "smartcard_login_api_v1_auth_smartcard_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CardLoginIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokensOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Smartcard Login",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/v1/auth/smartcard/challenge": {
+      "post": {
+        "operationId": "smartcard_challenge_api_v1_auth_smartcard_challenge_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChallengeIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChallengeOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Smartcard Challenge",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
     "/api/v1/bibs": {
       "get": {
         "operationId": "list_bibs_api_v1_bibs_get",
@@ -3357,6 +4115,307 @@
         ]
       }
     },
+    "/api/v1/devices": {
+      "get": {
+        "operationId": "list_devices_api_v1_devices_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/DeviceOut"
+                  },
+                  "title": "Response List Devices Api V1 Devices Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "List Devices",
+        "tags": [
+          "rfid middleware"
+        ]
+      },
+      "post": {
+        "operationId": "register_device_api_v1_devices_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeviceIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeviceCreatedOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Register Device",
+        "tags": [
+          "rfid middleware"
+        ]
+      }
+    },
+    "/api/v1/devices/{code}/commands": {
+      "get": {
+        "description": "For devices without a socket: fetch queued commands.",
+        "operationId": "poll_commands_api_v1_devices__code__commands_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "code",
+            "required": true,
+            "schema": {
+              "title": "Code",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-device-key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Device-Key"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Poll Commands",
+        "tags": [
+          "rfid middleware"
+        ]
+      }
+    },
+    "/api/v1/devices/{code}/commands/ack": {
+      "post": {
+        "operationId": "ack_command_api_v1_devices__code__commands_ack_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "code",
+            "required": true,
+            "schema": {
+              "title": "Code",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-device-key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Device-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommandAckIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Ack Command Api V1 Devices  Code  Commands Ack Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Ack Command",
+        "tags": [
+          "rfid middleware"
+        ]
+      }
+    },
+    "/api/v1/devices/{code}/events": {
+      "post": {
+        "operationId": "post_event_api_v1_devices__code__events_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "code",
+            "required": true,
+            "schema": {
+              "title": "Code",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-device-key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Device-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeviceEventIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "duplicate"
+          },
+          "202": {
+            "description": "accepted"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Post Event",
+        "tags": [
+          "rfid middleware"
+        ]
+      }
+    },
+    "/api/v1/devices/{code}/rotate-key": {
+      "post": {
+        "operationId": "rotate_key_api_v1_devices__code__rotate_key_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "code",
+            "required": true,
+            "schema": {
+              "title": "Code",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeviceCreatedOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Rotate Key",
+        "tags": [
+          "rfid middleware"
+        ]
+      }
+    },
     "/api/v1/fines": {
       "get": {
         "operationId": "list_fines_api_v1_fines_get",
@@ -3506,6 +4565,134 @@
         ]
       }
     },
+    "/api/v1/gate/events": {
+      "get": {
+        "operationId": "gate_events_api_v1_gate_events_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "alarm",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Alarm"
+            }
+          },
+          {
+            "in": "query",
+            "name": "from",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "From"
+            }
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "To"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/GateEventOut"
+                  },
+                  "title": "Response Gate Events Api V1 Gate Events Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Gate Events",
+        "tags": [
+          "security gate"
+        ]
+      }
+    },
+    "/api/v1/gate/events/{event_id}/photo": {
+      "get": {
+        "operationId": "gate_photo_api_v1_gate_events__event_id__photo_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "event_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Event Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Gate Photo",
+        "tags": [
+          "security gate"
+        ]
+      }
+    },
     "/api/v1/health": {
       "get": {
         "operationId": "health_api_v1_health_get",
@@ -3525,6 +4712,180 @@
         "summary": "Health",
         "tags": [
           "operations"
+        ]
+      }
+    },
+    "/api/v1/inventory/sessions": {
+      "post": {
+        "operationId": "start_api_v1_inventory_sessions_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Start Api V1 Inventory Sessions Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Start",
+        "tags": [
+          "inventory"
+        ]
+      }
+    },
+    "/api/v1/inventory/sessions/{session_id}": {
+      "get": {
+        "operationId": "get_session_summary_api_v1_inventory_sessions__session_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Session Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Get Session Summary Api V1 Inventory Sessions  Session Id  Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Session Summary",
+        "tags": [
+          "inventory"
+        ]
+      }
+    },
+    "/api/v1/inventory/sessions/{session_id}/close": {
+      "post": {
+        "operationId": "close_api_v1_inventory_sessions__session_id__close_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Session Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Close Api V1 Inventory Sessions  Session Id  Close Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Close",
+        "tags": [
+          "inventory"
+        ]
+      }
+    },
+    "/api/v1/inventory/sessions/{session_id}/mark-missing": {
+      "post": {
+        "operationId": "mark_missing_api_v1_inventory_sessions__session_id__mark_missing_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Session Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Mark Missing Api V1 Inventory Sessions  Session Id  Mark Missing Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Mark Missing",
+        "tags": [
+          "inventory"
         ]
       }
     },
@@ -4171,6 +5532,120 @@
         ]
       }
     },
+    "/api/v1/migration/batches": {
+      "post": {
+        "operationId": "upload_batch_api_v1_migration_batches_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Upload Batch",
+        "tags": [
+          "migration"
+        ]
+      }
+    },
+    "/api/v1/ncip": {
+      "post": {
+        "operationId": "ncip_api_v1_ncip_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-agency-key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Agency-Key"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Ncip",
+        "tags": [
+          "interoperability"
+        ]
+      }
+    },
+    "/api/v1/notifications/outbox": {
+      "get": {
+        "operationId": "outbox_api_v1_notifications_outbox_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/OutboxStatus"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/OutboxOut"
+                  },
+                  "title": "Response Outbox Api V1 Notifications Outbox Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Outbox",
+        "tags": [
+          "security gate"
+        ]
+      }
+    },
     "/api/v1/opac/search": {
       "get": {
         "operationId": "search_api_v1_opac_search_get",
@@ -4469,6 +5944,192 @@
         "summary": "Run Report",
         "tags": [
           "reports"
+        ]
+      }
+    },
+    "/api/v1/tags": {
+      "get": {
+        "operationId": "list_tags_api_v1_tags_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/TagStatus"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/TagOut"
+                  },
+                  "title": "Response List Tags Api V1 Tags Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Tags",
+        "tags": [
+          "tagging"
+        ]
+      },
+      "post": {
+        "operationId": "associate_api_v1_tags_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TagIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TagDetailOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Associate",
+        "tags": [
+          "tagging"
+        ]
+      }
+    },
+    "/api/v1/tags/{epc}": {
+      "get": {
+        "operationId": "get_tag_api_v1_tags__epc__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "epc",
+            "required": true,
+            "schema": {
+              "title": "Epc",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TagDetailOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Tag",
+        "tags": [
+          "tagging"
+        ]
+      }
+    },
+    "/api/v1/tags/{epc}/retire": {
+      "post": {
+        "operationId": "retire_api_v1_tags__epc__retire_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "epc",
+            "required": true,
+            "schema": {
+              "title": "Epc",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReasonIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TagDetailOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Retire",
+        "tags": [
+          "tagging"
         ]
       }
     },

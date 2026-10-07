@@ -17,6 +17,10 @@ cd "$ROOT/backend"
 "$PY" -m pip_audit -r requirements.txt --progress-spinner off > "$REPORTS/pip-audit.txt" 2>&1 || { cat "$REPORTS/pip-audit.txt"; exit 1; }
 "$PY" -m pytest -q --cov=app --cov-report=term --junitxml="$REPORTS/junit.xml" | tee "$REPORTS/pytest.txt"
 
+echo "== device simulator: tests"
+cd "$ROOT/device-sim"
+"$PY" -m pytest -q -p no:cacheprovider test_sim.py
+
 echo "== frontend: types, tests, dependencies, build"
 cd "$ROOT/frontend"
 npx tsc -b

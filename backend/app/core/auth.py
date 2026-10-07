@@ -38,7 +38,11 @@ def get_principal(request: Request, session: Session = Depends(get_session)) -> 
     header = request.headers.get("Authorization", "")
     if not header.startswith("Bearer "):
         raise _unauthenticated()
-    claims = decode_access_token(header[7:])
+    return principal_from_token(session, header[7:])
+
+
+def principal_from_token(session: Session, token: str) -> Principal:
+    claims = decode_access_token(token)
     try:
         sub = uuid.UUID(claims["sub"])
     except ValueError as exc:

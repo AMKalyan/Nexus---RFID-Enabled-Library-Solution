@@ -37,6 +37,10 @@ class Settings(BaseSettings):
     rate_limit_migration: str = "10/minute"
     upload_max_mb: int = 25
     sip2_listener_enabled: bool = False
+    sip2_host: str = "127.0.0.1"  # set to 0.0.0.0 inside the container, with SIP2_ALLOWED_HOSTS
+    sip2_port: int = 6001
+    sip2_allowed_hosts: list[str] = []
+    run_worker: bool = True
     licence_file: str = "licence.json"
     licence_key: SecretStr = SecretStr("dev-licence-key")
 

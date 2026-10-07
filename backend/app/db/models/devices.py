@@ -108,3 +108,15 @@ class InventoryRead(Base):
     item_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("nexus.item.id"))
     result: Mapped[InventoryResult] = mapped_column(pg_enum(InventoryResult, "inventory_result"))
     read_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class Agency(Base):
+    """An external system allowed to call the NCIP endpoint (e.g. a self-check kiosk or partner ILMS)."""
+
+    __tablename__ = "agency"
+    __table_args__ = NEXUS
+
+    code: Mapped[str] = mapped_column(String(20), primary_key=True)
+    name: Mapped[str] = mapped_column(Text)
+    api_key_hash: Mapped[str] = mapped_column(String(64))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

@@ -1,4 +1,7 @@
+import asyncio
+import contextlib
 import logging
+from collections.abc import AsyncIterator
 
 from alembic.runtime.migration import MigrationContext
 from fastapi import FastAPI, Request
@@ -6,12 +9,30 @@ from fastapi.responses import JSONResponse
 from slowapi.errors import RateLimitExceeded
 from sqlalchemy import select
 
-from app.api.v1 import admin, auth, catalog, circulation, fines, health, members, opac, reports
+from app.api.v1 import (
+    admin,
+    auth,
+    catalog,
+    circulation,
+    devices,
+    fines,
+    gate,
+    health,
+    inventory,
+    members,
+    migration,
+    ncip,
+    opac,
+    reports,
+    tags,
+    ws,
+)
 from app.core.config import get_settings
 from app.core.errors import install_error_handlers
 from app.core.logging import configure_logging
 from app.core.ratelimit import limiter
 from app.db.base import engine
+from app.middleware_rfid import handlers as _event_handlers  # noqa: F401  (registers device event handlers)
 
 log = logging.getLogger("nexus.health")
 
@@ -28,10 +49,34 @@ def _database_check(app: FastAPI) -> tuple[str, bool]:
         return "database", False
 
 
+@contextlib.asynccontextmanager
+async def _with_worker(_: FastAPI) -> AsyncIterator[None]:
+    """Background services for the lifetime of the API process: outbox worker and optional SIP2 listener."""
+    from app.worker import run_forever
+
+    settings = get_settings()
+    stop = asyncio.Event()
+    task = asyncio.create_task(run_forever(stop))
+    sip2 = None
+    if settings.sip2_listener_enabled:
+        from app.interop.sip2_server import start
+
+        sip2 = await start(settings.sip2_host, settings.sip2_port, set(settings.sip2_allowed_hosts))
+    try:
+        yield
+    finally:
+        stop.set()
+        await task
+        if sip2 is not None:
+            sip2.close()
+            await sip2.wait_closed()
+
+
 def create_app(check_db: bool = True) -> FastAPI:
     settings = get_settings()
     configure_logging(settings.log_level)
     app = FastAPI(
+        lifespan=_with_worker if check_db and settings.run_worker else None,
         title="Nexus API",
         version=settings.app_version,
         docs_url="/api/docs",
@@ -57,6 +102,13 @@ def create_app(check_db: bool = True) -> FastAPI:
     app.include_router(fines.router, prefix="/api/v1")
     app.include_router(admin.router, prefix="/api/v1")
     app.include_router(reports.router, prefix="/api/v1")
+    app.include_router(devices.router, prefix="/api/v1")
+    app.include_router(tags.router, prefix="/api/v1")
+    app.include_router(inventory.router, prefix="/api/v1")
+    app.include_router(gate.router, prefix="/api/v1")
+    app.include_router(migration.router, prefix="/api/v1")
+    app.include_router(ncip.router, prefix="/api/v1")
+    app.include_router(ws.router, prefix="/api/v1")
     return app
 
 

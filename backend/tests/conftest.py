@@ -337,3 +337,98 @@ def activity_world(db_session):
         alarms_today=2,
         open_fines_total=str(Decimal("20.00")),
     )
+
+
+# --- device fixtures (each exposes .raw_key) --------------------------------------------------------
+
+
+@pytest.fixture
+def device_hh(db_session):
+    from tests.factories import make_device
+
+    return make_device(db_session, "HH-01", "handheld")
+
+
+@pytest.fixture
+def device_gate(db_session):
+    from tests.factories import make_device
+
+    return make_device(db_session, "GATE-01", "gate", config={"camera": "CAM-01"})
+
+
+@pytest.fixture
+def device_staff(db_session):
+    from tests.factories import make_device
+
+    return make_device(db_session, "STAFF-01", "staff_station")
+
+
+@pytest.fixture
+def device_card(db_session):
+    from tests.factories import make_device
+
+    return make_device(db_session, "CARD-01", "smartcard_reader")
+
+
+@pytest.fixture
+def camera(db_session):
+    from tests.factories import make_device
+
+    return make_device(db_session, "CAM-01", "camera")
+
+
+@pytest.fixture
+def device_event():
+    """device_event("TagsRead", device_type="handheld", epcs=[...], **payload) -> event body."""
+    import uuid
+    from datetime import UTC, datetime
+
+    def build(
+        event_type="Heartbeat", device_type="handheld", epcs=None, occurred_at=None, event_id=None, **payload
+    ):
+        return {
+            "event_id": event_id or str(uuid.uuid4()),
+            "device_type": device_type,
+            "type": event_type,
+            "occurred_at": (occurred_at or datetime.now(UTC)).isoformat(),
+            "epcs": epcs or [],
+            "payload": payload,
+        }
+
+    return build
+
+
+@pytest.fixture
+def shelf_world(db_session):
+    """Six tagged items on A-01 and three on B-01; exposes their EPCs and items."""
+    from types import SimpleNamespace
+
+    from tests.factories import make_bib, make_item, make_tag
+
+    def stock(shelf, n):
+        items = [
+            make_item(db_session, make_bib(db_session, title=f"{shelf} book {i}"), shelf_code=shelf)
+            for i in range(n)
+        ]
+        return items, [make_tag(db_session, item).epc for item in items]
+
+    a_items, a_epcs = stock("A-01", 6)
+    b_items, b_epcs = stock("B-01", 3)
+    return SimpleNamespace(a01_items=a_items, a01_epcs=a_epcs, b01_items=b_items, b01_epcs=b_epcs)
+
+
+@pytest.fixture
+def agency(db_session):
+    """NCIP agency (e.g. a self-check kiosk) with a known key exposed as .raw_key."""
+    import hashlib
+
+    from app.db.models import Agency
+
+    raw = "agency-key-for-tests"
+    row = Agency(
+        code="KIOSK-01", name="Self-check kiosk", api_key_hash=hashlib.sha256(raw.encode()).hexdigest()
+    )
+    db_session.add(row)
+    db_session.flush()
+    row.raw_key = raw
+    return row

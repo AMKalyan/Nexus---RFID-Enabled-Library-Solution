@@ -9,6 +9,8 @@ from app.core.errors import AppError
 from app.core.ratelimit import limiter
 from app.core.security import revoke_refresh_token, rotate_refresh_token
 from app.db.base import get_session
+from app.db.models import Device, DeviceType
+from app.services.smartcard import challenges
 from app.services.users import authenticate_password, issue_tokens, role_of, token_response
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -105,3 +107,64 @@ def me(principal: Principal = Depends(get_principal)) -> MeOut:
         role=principal.role,
         permissions=sorted(principal.permissions),
     )
+
+
+# --- smart-card sign-in (AC 07) ----------------------------------------------------------------------
+
+
+class ChallengeIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    reader_code: str = Field(min_length=1, max_length=20)
+
+
+class ChallengeOut(BaseModel):
+    challenge_id: str
+    expires_in: int
+
+
+class CardLoginIn(ChallengeIn):
+    challenge_id: str = Field(min_length=10, max_length=64)
+
+
+@router.post("/smartcard/challenge", response_model=ChallengeOut)
+@limiter.limit(get_settings().rate_limit_auth)
+def smartcard_challenge(
+    request: Request, body: ChallengeIn, session: Session = Depends(get_session)
+) -> ChallengeOut:
+    reader = session.get(Device, body.reader_code)
+    if reader is None or reader.device_type != DeviceType.smartcard_reader:
+        raise AppError("READER_NOT_FOUND", "Unknown card reader", 404)
+    return ChallengeOut(challenge_id=challenges.open(body.reader_code), expires_in=60)
+
+
+@router.post("/smartcard", response_model=TokensOut)
+@limiter.limit(get_settings().rate_limit_auth)
+def smartcard_login(request: Request, body: CardLoginIn, session: Session = Depends(get_session)) -> dict:
+    ip = request.client.host if request.client else None
+    try:
+        identity = challenges.consume(body.reader_code, body.challenge_id)
+    except AppError as exc:
+        if exc.code == "CARD_UNKNOWN":
+            audit(
+                session,
+                actor_type="external",
+                actor_id=None,
+                action="auth.login.failure",
+                entity_type="session",
+                details={"method": "smartcard", "reader": body.reader_code},
+                ip=ip,
+            )
+            session.commit()
+        raise
+    tokens = issue_tokens(session, "staff", identity.user_id, identity.role)
+    audit(
+        session,
+        actor_type="staff",
+        actor_id=identity.user_id,
+        action="auth.login.success",
+        entity_type="session",
+        details={"method": "smartcard", "reader": body.reader_code},
+        ip=ip,
+    )
+    session.commit()
+    return tokens

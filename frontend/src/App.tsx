@@ -15,6 +15,7 @@ import { InventoryPage } from "./pages/InventoryPage";
 import { ItemPage } from "./pages/ItemPage";
 import { LoginPage } from "./pages/LoginPage";
 import { MembersPage } from "./pages/MembersPage";
+import { MigrationPage } from "./pages/MigrationPage";
 import { MyLoansPage } from "./pages/MyLoansPage";
 import { OpacPage } from "./pages/OpacPage";
 import { ReportsPage } from "./pages/ReportsPage";
@@ -58,6 +59,7 @@ export default function App() {
               <Route path="/inventory" element={<InventoryPage />} />
               <Route path="/gate" element={<GateMonitorPage />} />
               <Route path="/devices" element={<DevicesPage />} />
+              <Route path="/migration" element={<MigrationPage />} />
               <Route path="/reports" element={<ReportsPage />} />
               <Route path="/audit" element={<AuditPage />} />
               <Route path="/admin" element={<AdminPage />} />

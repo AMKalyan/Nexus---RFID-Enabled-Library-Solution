@@ -432,3 +432,37 @@ def agency(db_session):
     db_session.flush()
     row.raw_key = raw
     return row
+
+
+# --- migration / operations fixtures ----------------------------------------------------------------
+
+
+@pytest.fixture
+def ops_env(migrated_db, monkeypatch, tmp_path):
+    """Point backup/restore/integrity tooling at the test database and a temporary backup folder."""
+    import shutil
+
+    monkeypatch.setenv("OPS_DATABASE_URL", BASE_OWNER)
+    monkeypatch.setenv("BACKUP_DIR", str(tmp_path / "backups"))
+    if shutil.which("pg_dump") is None:
+        monkeypatch.setenv("PG_TOOLS_CONTAINER", os.environ.get("PG_TOOLS_CONTAINER", "nexus-db-1"))
+    return tmp_path / "backups"
+
+
+@pytest.fixture
+def integrity(ops_env):
+    from nexus_ops import integrity as module
+
+    return module
+
+
+@pytest.fixture(scope="session")
+def sample_xlsx(tmp_path_factory):
+    """A 2,000-row synthetic export plus its defect manifest (generated once per test session)."""
+    from types import SimpleNamespace
+
+    sys.path.insert(0, str(BACKEND_DIR.parent / "migration"))
+    from gen_sample import generate
+
+    path = tmp_path_factory.mktemp("migration") / "export.xlsx"
+    return SimpleNamespace(path=path, manifest=generate(path, rows=2000, seed=11))

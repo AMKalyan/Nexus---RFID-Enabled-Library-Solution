@@ -37,7 +37,7 @@ ops/backups/
 ops/bundles/
 ops/demo-credentials.txt
 migration/output/
-migration/samples/*.xlsx
+migration/samples/
 outbox/
 logs/
 *.log
@@ -45,3 +45,4 @@ ops/nginx/certs/
 backend/reports/
 *.tsbuildinfo
 device-sim/.state/
+ops/reports/

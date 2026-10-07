@@ -1,0 +1,18 @@
+# Validation rules for migrated items. Each failure adds its reason code to the row.
+required:
+  title: TITLE_MISSING
+  accession_no: ACCESSION_MISSING
+  barcode: BARCODE_MISSING
+patterns:
+  accession_no: { regex: '^[A-Z]{2,5}-\d{4,10}$', code: ACCESSION_FORMAT }
+ranges:
+  pub_year: { min: 1450, max: current_year, code: YEAR_RANGE }
+  price: { min: 0, code: PRICE_NEGATIVE }
+allowed:
+  item_type: { values: [lending, reference], code: ITEM_TYPE_UNKNOWN }
+isbn:
+  field: isbn
+  code: ISBN_CHECKSUM
+duplicates:
+  exact_keys: [accession_no]           # same accession earlier in the file, or already in the catalogue
+  likely_keys: [title, author, pub_year] # normalised; flagged LIKELY_DUPLICATE but still migrated

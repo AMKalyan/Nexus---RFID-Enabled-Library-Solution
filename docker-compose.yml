@@ -38,7 +38,9 @@ services:
   web:
     image: nexus-web:${NEXUS_VERSION}
     build: { context: ., dockerfile: frontend/Dockerfile }
-    ports: ["8443:443", "8080:80"]
+    ports: ["${HTTPS_PORT:-8443}:443", "${HTTP_PORT:-8080}:80"]
+    environment:
+      HTTPS_PORT: ${HTTPS_PORT:-8443}  # used in the HTTP to HTTPS redirect
     volumes:
       - ./ops/nginx/certs:/etc/nginx/certs:ro
     depends_on:

@@ -25,7 +25,7 @@ REQ_ID = re.compile(r"(?:FR|NFR) \d{2}")
 OTHER_EVIDENCE = {
     "FR 12": (
         "Offline install, update and rollback rehearsal (`ops/tests/ac09_offline_lifecycle.md`)",
-        "Release",
+        "Rehearsal",
     ),
     "NFR 03": ("UAT in a browser on Windows 11; Windows Server notes in the deployment guide", "Release"),
     "NFR 04": (
@@ -43,7 +43,10 @@ OTHER_EVIDENCE = {
     "NFR 07": ("JSON logs with correlation IDs; operations runbook", "Inspection"),
     "NFR 08": ("Documentation packages D2 and D5; D7 and D8 at release", "Release"),
     "NFR 09": ("Stage gate records; production backlog", "Release"),
-    "AC 09": ("Offline rehearsal of the 1.0.0 to 1.0.1 update and rollback", "Release"),
+    "AC 09": (
+        "Offline rehearsal of the 1.0.0 to 1.0.1 update and rollback (`ops/tests/ac09_offline_lifecycle.md`)",
+        "Rehearsal",
+    ),
 }
 
 Case = tuple[str, str, str]  # (suite, test name, outcome)
@@ -91,6 +94,8 @@ def verdict(req: str, tally, covered_by: dict[str, list[str]]) -> str:  # noqa: 
         return "FAIL"
     if kind == "Release":
         return "Pass (tests); release evidence pending" if tested else "Pending release"
+    if kind == "Rehearsal":
+        return "Pass (tests and rehearsal)" if tested else "Pass (rehearsal)"
     return "Pass" if tested else "Inspection"
 
 

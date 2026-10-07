@@ -51,3 +51,5 @@ bash ops/ci-local.sh              # format, lint, types, bandit, dependency audi
 ```
 
 The `docker-compose.dev.yml` override exposes PostgreSQL on `localhost:5433` for the test suite and runs the API with `ENVIRONMENT=dev`. Without it the API image runs in production mode and refuses to start with development or placeholder secrets.
+
+To use the operator scripts (`ops/backup.sh`, `ops/restore.sh`, …) against a development stack, include the override for those commands too, for example `COMPOSE_FILE="docker-compose.yml;docker-compose.dev.yml" sh ops/restore.sh <file>`. On Linux and macOS, separate the two files with `:` instead of `;`.

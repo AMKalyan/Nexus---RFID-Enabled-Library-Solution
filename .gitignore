@@ -43,3 +43,4 @@ logs/
 *.log
 ops/nginx/certs/
 backend/reports/
+*.tsbuildinfo

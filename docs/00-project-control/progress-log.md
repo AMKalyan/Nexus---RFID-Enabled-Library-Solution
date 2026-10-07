@@ -9,7 +9,7 @@ A running record of delivery against the SOP §9 stages. It is updated at every 
 | 1 Initiation & controls | Day 1 (2026-10-04) | 2026-10-04 | `sop-stage-1` |
 | 2 Requirements & design | Day 1 (2026-10-04) | 2026-10-04 | `sop-stage-2` |
 | 3 Foundation build | Day 1 (2026-10-04) | 2026-10-05 | `sop-stage-3` |
-| 4 Core library functions | Day 2 (2026-10-05) AM | — | `sop-stage-4` |
+| 4 Core library functions | Day 2 (2026-10-05) AM | 2026-10-07 | `sop-stage-4` |
 | 5 RFID middleware & integrations | Day 2 midday | — | `sop-stage-5` |
 | 6 Migration & resilience | Day 2 afternoon | — | `sop-stage-6` |
 | 7 Verification | Day 2 evening | — | `sop-stage-7` |
@@ -40,4 +40,10 @@ A running record of delivery against the SOP §9 stages. It is updated at every 
 - Dependency scans found published vulnerabilities in both stacks (DEF-001, DEF-003); dependencies upgraded and retested.
 - Stage 3 gate approved, merged and tagged `sop-stage-3`.
 
-**Next task:** Task 7 of `implementation-plan.md` (catalogue, OPAC search, virtual bookshelf, spine labels) on `stage/4-core`. Start the database with `docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d`.
+### 2026-10-07 — Session 3
+- Stage 3 merged and tagged `sop-stage-3` and `day1-checkpoint`.
+- Stage 4 Tasks 7–11: cataloguing and OPAC search; members, policy engine, circulation and fines; dashboard and reports; administration; UI screens. 108 backend and 5 frontend tests passing.
+- Manual user journeys recorded in `docs/06-testing/user-journeys.md`; DEF-004 closed.
+- Stage 4 gate approved, merged and tagged `sop-stage-4`.
+
+**Next task:** Task 12 of `implementation-plan.md` (device registry, event ingest, dispatcher, command bus, live hub) on `stage/5-rfid`.

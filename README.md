@@ -21,4 +21,33 @@ All external devices and services (RFID readers, handhelds, gates, smart cards, 
 
 Development follows the AISYS Software Development SOP §9 stage by stage. Each stage is delivered on a `stage/N-*` branch, closed by a stage-gate review record in `docs/00-project-control/stage-gates/`, merged into `main` and tagged `sop-stage-N`.
 
-Build and run instructions are added in SOP Stage 3 (foundation build).
+## Build and run (development)
+
+Prerequisites: Docker Desktop (Linux containers), Python 3.12, Node 22, Git Bash or a POSIX shell.
+
+```bash
+cp .env.example .env              # then replace every placeholder value
+sh ops/nginx/gen-cert.sh          # self-signed certificate for local HTTPS
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d --build
+docker compose exec api python -m app.db.seed --legacy 2000 --demo
+```
+
+- Application: https://localhost:8443. The certificate is self-signed.
+- API documentation: https://localhost:8443/api/docs
+- Generated demo credentials: `ops/demo-credentials.txt` (git-ignored).
+
+Local development without containers for the API and UI:
+
+```bash
+cd backend && python -m venv .venv && .venv/Scripts/pip install -r requirements-dev.txt
+.venv/Scripts/alembic upgrade head && .venv/Scripts/uvicorn app.main:app --reload    # :8000
+cd frontend && npm ci && npm run dev                                                  # :5173
+```
+
+## Quality checks
+
+```bash
+bash ops/ci-local.sh              # format, lint, types, bandit, dependency audits, tests, build
+```
+
+The `docker-compose.dev.yml` override exposes PostgreSQL on `localhost:5433` for the test suite.

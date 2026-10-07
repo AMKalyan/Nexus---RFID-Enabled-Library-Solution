@@ -8,7 +8,7 @@ A running record of delivery against the SOP §9 stages. It is updated at every 
 |---|---|---|---|
 | 1 Initiation & controls | Day 1 (2026-10-04) | 2026-10-04 | `sop-stage-1` |
 | 2 Requirements & design | Day 1 (2026-10-04) | 2026-10-04 | `sop-stage-2` |
-| 3 Foundation build | Day 1 (2026-10-04) | — | `sop-stage-3` |
+| 3 Foundation build | Day 1 (2026-10-04) | 2026-10-05 | `sop-stage-3` |
 | 4 Core library functions | Day 2 (2026-10-05) AM | — | `sop-stage-4` |
 | 5 RFID middleware & integrations | Day 2 midday | — | `sop-stage-5` |
 | 6 Migration & resilience | Day 2 afternoon | — | `sop-stage-6` |
@@ -30,4 +30,14 @@ A running record of delivery against the SOP §9 stages. It is updated at every 
 - Stage 1 merged and tagged `sop-stage-1`.
 - Stage 2 on `stage/2-design`: use cases, data dictionary, architecture, database, interface and security designs, ADR-0001..0005, design review, implementation plan.
 
-**Next task:** Stage 2 gate → merge → tag `sop-stage-2`, then Task 1 of `implementation-plan.md` on `stage/3-foundation` (needs Docker Desktop running for Task 2 onwards).
+- Stage 2 merged and tagged `sop-stage-2`.
+- Stage 3 started on `stage/3-foundation`: Task 1 (backend skeleton, config, logging, sanitised errors, version endpoint) done, 6 unit tests passing.
+- Paused for the development host reboot that completes the Docker Desktop installation.
+
+### 2026-10-05 — Session 2
+- WSL2 and Docker Desktop completed on the development host; PostgreSQL 16.4 runs in Docker.
+- Stage 3 Tasks 2–6: database schemas, roles and baseline migration; authentication, tokens and RBAC; audit, legacy connector and synthetic seed; containers, TLS proxy and local pipeline. Task 5 (frontend shell) was done earlier while waiting for Docker.
+- Dependency scans found published vulnerabilities in both stacks (DEF-001, DEF-003); dependencies upgraded and retested.
+- Stage 3 gate approved, merged and tagged `sop-stage-3`.
+
+**Next task:** Task 7 of `implementation-plan.md` (catalogue, OPAC search, virtual bookshelf, spine labels) on `stage/4-core`. Start the database with `docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d`.

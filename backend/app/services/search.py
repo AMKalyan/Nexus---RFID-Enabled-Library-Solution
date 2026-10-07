@@ -1,5 +1,8 @@
-from sqlalchemy import Integer, cast, func, select
-from sqlalchemy.orm import Session
+from typing import Any
+
+from sqlalchemy import exists, func, select
+from sqlalchemy.orm import InstrumentedAttribute, Session
+from sqlalchemy.sql.elements import ColumnElement
 
 from app.core.errors import AppError
 from app.db.models import Bib, Item, ItemStatus, Shelf
@@ -22,30 +25,33 @@ class SearchService:
         year_to: int | None = None,
         available: bool | None = None,
     ) -> OpacPage:
-        total_copies = func.count(Item.id)
-        available_copies = func.coalesce(func.sum(cast(Item.status == ItemStatus.available, Integer)), 0)
-        query = (
-            select(Bib, total_copies.label("total"), available_copies.label("available"))
-            .outerjoin(Item, (Item.bib_id == Bib.id) & (Item.status != ItemStatus.withdrawn))
-            .group_by(Bib.id)
-        )
+        # Filter bibs first. Copy counts are correlated per bib (bib_id index), so they are computed only
+        # for the page being returned, not for every item in the catalogue.
+        filters: list[ColumnElement[bool]] = []
+        order_by: list[ColumnElement[Any] | InstrumentedAttribute[Any]] = [Bib.title]
         if q:
             tsq = func.websearch_to_tsquery("simple", q)
-            query = query.where(Bib.search_tsv.op("@@")(tsq)).order_by(
-                func.ts_rank(Bib.search_tsv, tsq).desc(), Bib.title
-            )
-        else:
-            query = query.order_by(Bib.title)
+            filters.append(Bib.search_tsv.op("@@")(tsq))
+            order_by = [func.ts_rank(Bib.search_tsv, tsq).desc(), Bib.title]
         if author:
-            query = query.where(Bib.author.ilike(f"%{author}%"))
+            filters.append(Bib.author.ilike(f"%{author}%"))
         if year_from is not None:
-            query = query.where(Bib.pub_year >= year_from)
+            filters.append(Bib.pub_year >= year_from)
         if year_to is not None:
-            query = query.where(Bib.pub_year <= year_to)
+            filters.append(Bib.pub_year <= year_to)
+        is_available = (Item.bib_id == Bib.id) & (Item.status == ItemStatus.available)
         if available:
-            query = query.having(available_copies > 0)
+            filters.append(exists().where(is_available))
 
-        total = self.session.scalar(select(func.count()).select_from(query.subquery())) or 0
+        total_copies = (
+            select(func.count(Item.id))
+            .where(Item.bib_id == Bib.id, Item.status != ItemStatus.withdrawn)
+            .scalar_subquery()
+        )
+        available_copies = select(func.count(Item.id)).where(is_available).scalar_subquery()
+        query = select(Bib, total_copies, available_copies).where(*filters).order_by(*order_by)
+
+        total = self.session.scalar(select(func.count(Bib.id)).where(*filters)) or 0
         rows = self.session.execute(query.offset((page - 1) * size).limit(size)).all()
         items = [
             OpacHit(

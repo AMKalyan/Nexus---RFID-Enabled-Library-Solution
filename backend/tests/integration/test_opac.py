@@ -51,3 +51,23 @@ def test_fr02_malicious_query_is_safe(client):
 
 def test_fr02_page_size_is_bounded(client):
     assert client.get("/api/v1/opac/search", params={"q": "x", "size": 10000}).status_code == 422
+
+
+def test_fr02_copy_counts_and_available_filter(client, db_session, make_bib):
+    from app.db.models import ItemStatus
+    from tests.factories import make_item
+
+    mixed = make_bib(title="Copies Mixed")
+    make_item(db_session, mixed, status=ItemStatus.available)
+    make_item(db_session, mixed, status=ItemStatus.on_loan)
+    make_item(db_session, mixed, status=ItemStatus.withdrawn)
+    make_item(db_session, make_bib(title="Copies Lent"), status=ItemStatus.on_loan)
+    make_bib(title="Copies None")
+
+    hits = {h["title"]: h for h in client.get("/api/v1/opac/search", params={"q": "copies"}).json()["items"]}
+    assert (hits["Copies Mixed"]["total_copies"], hits["Copies Mixed"]["available_copies"]) == (2, 1)
+    assert (hits["Copies Lent"]["total_copies"], hits["Copies Lent"]["available_copies"]) == (1, 0)
+    assert (hits["Copies None"]["total_copies"], hits["Copies None"]["available_copies"]) == (0, 0)
+
+    only = client.get("/api/v1/opac/search", params={"q": "copies", "available": "true"}).json()
+    assert only["total"] == 1 and [h["title"] for h in only["items"]] == ["Copies Mixed"]

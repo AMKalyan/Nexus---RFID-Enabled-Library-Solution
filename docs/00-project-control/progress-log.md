@@ -59,4 +59,10 @@ A running record of delivery against the SOP §9 stages. It is updated at every 
 - Defects DEF-007 to DEF-014 raised. S2 defects DEF-009 (insecure defaults accepted outside development) and DEF-011 (local pipeline hid failures) fixed on `fix/` branches; DEF-008 (50-user latency) recorded as a known limitation; DEF-012 (one unexplained stall) mitigated with a fail-fast lock timeout.
 - The API image now defaults to production mode; local development uses `docker-compose.dev.yml`.
 
-**Next task:** Task 26 of `implementation-plan.md` (offline bundle, install, update and rollback, AC 09), then the Stage 7 gate (Task 25 Step 8).
+### 2026-10-08 — Session 4
+- Task 26 on `stage/7-verification`: offline bundle build, verified install, update with automatic rollback, manual rollback, licence activation (read-only until licensed outside development). Releases tagged `v1.0.0` and `v1.0.1` (build notes, reversible migration 0004).
+- AC 09 rehearsed with networking off: install 1.0.0, update to 1.0.1, roll back to 1.0.0, legacy data IDENTICAL (`ops/tests/ac09_offline_lifecycle.md`). The development database was backed up first and restored afterwards.
+- Gate run: 242 backend (92% coverage), 83 acceptance, 6 simulator, 5 migration-tool, 9 frontend tests passing; traceability matrix 253 of 253 passing.
+- Stage 7 gate record written; awaiting approval.
+
+**Next task:** Stage 7 gate approval, then Task 27 (D4 SBOM, D7 deployment, D8 operations, D9 demonstration documents, final release tag) on `release/1.0.0`.

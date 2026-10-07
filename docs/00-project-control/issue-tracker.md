@@ -34,5 +34,9 @@ Status values: Open, In progress, Done, Deferred.
 | NX-042 | Static-analysis findings in SIP2 listener and NCIP builder | stage-5, NFR-02 | Stage 5 | Done | Stage 5 merge |
 | NX-050 | Migration and resilience | stage-6, FR-10, NFR-01 | Stage 6 | Done | Stage 6 merge |
 | NX-051 | Staging performance and backup client version (DEF-005, DEF-006) | stage-6, defect | Stage 6 | Done | Stage 6 merge |
-| NX-060 | Verification | stage-7, NFR-05 | Stage 7 | Open | |
+| NX-060 | Verification | stage-7, NFR-05 | Stage 7 | Done | Stage 7 merge |
+| NX-061 | Stage 7 defects DEF-007, DEF-009 to DEF-011, DEF-013, DEF-014 | stage-7, defect | Stage 7 | Done | Stage 7 merge |
+| NX-062 | Offline bundle, install, update, rollback and licence activation (AC 09) | stage-7, FR-12 | Stage 7 | Done | Stage 7 merge |
+| NX-063 | Scale the API beyond one process (DEF-008) | backlog, NFR-05 | Backlog | Open | |
+| NX-064 | Identify the cause of the intermittent test stall (DEF-012) | backlog, defect | Backlog | Open | |
 | NX-070 | Release, deployment package, operational docs, demonstration | release, FR-12 | Release | Open | |

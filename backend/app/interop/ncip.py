@@ -1,6 +1,6 @@
 """NCIP 2.0 adapter: LookupUser, CheckOutItem, RenewItem and CheckInItem (interface design §3.1)."""
 
-import xml.etree.ElementTree as ET  # noqa: S405 - used only to build responses; parsing uses defusedxml
+import xml.etree.ElementTree as ET  # noqa: S405  # nosec B405 - builds responses only; parsing uses defusedxml
 from collections.abc import Callable
 
 from defusedxml import DefusedXmlException

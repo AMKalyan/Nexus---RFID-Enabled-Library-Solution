@@ -61,7 +61,7 @@ async def _with_worker(_: FastAPI) -> AsyncIterator[None]:
     if settings.sip2_listener_enabled:
         from app.interop.sip2_server import start
 
-        sip2 = await start("0.0.0.0", settings.sip2_port, set(settings.sip2_allowed_hosts))  # noqa: S104
+        sip2 = await start(settings.sip2_host, settings.sip2_port, set(settings.sip2_allowed_hosts))
     try:
         yield
     finally:

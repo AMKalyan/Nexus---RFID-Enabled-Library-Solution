@@ -21,6 +21,10 @@ echo "== device simulator: tests"
 cd "$ROOT/device-sim"
 "$PY" -m pytest -q -p no:cacheprovider test_sim.py
 
+echo "== migration tools: tests"
+cd "$ROOT/migration"
+"$PY" -m pytest -q -p no:cacheprovider test_gen_sample.py
+
 echo "== frontend: types, tests, dependencies, build"
 cd "$ROOT/frontend"
 npx tsc -b

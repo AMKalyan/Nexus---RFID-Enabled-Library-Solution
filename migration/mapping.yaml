@@ -1,0 +1,16 @@
+# Source spreadsheet column -> Nexus field. Change only this file to import a different export layout.
+columns:
+  Accession No: accession_no
+  Barcode: barcode
+  Title: title
+  Author: author
+  ISBN: isbn
+  Publisher: publisher
+  Year: pub_year
+  Edition: edition
+  Subjects: subjects
+  Call No: call_no
+  Shelf: shelf_code
+  Item Type: item_type
+  Price: price
+  Acquired On: acquired_on

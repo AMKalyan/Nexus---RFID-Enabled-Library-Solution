@@ -44,3 +44,4 @@ logs/
 ops/nginx/certs/
 backend/reports/
 *.tsbuildinfo
+device-sim/.state/

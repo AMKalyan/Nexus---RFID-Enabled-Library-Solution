@@ -44,6 +44,20 @@ services:
     depends_on:
       api: { condition: service_healthy }
 
+  devsim:
+    # Demonstration only: docker compose --profile demo up -d devsim
+    profiles: ["demo"]
+    image: nexus-devsim:${NEXUS_VERSION}
+    build: { context: ., dockerfile: device-sim/Dockerfile }
+    environment:
+      SIM_API: http://api:8000/api/v1
+      SIM_PANEL_HOST: 0.0.0.0
+    ports: ["127.0.0.1:8100:8100"]
+    volumes:
+      - ./ops/demo-credentials.txt:/ops/demo-credentials.txt:ro
+    depends_on:
+      api: { condition: service_healthy }
+
 volumes:
   pgdata:
   backups:

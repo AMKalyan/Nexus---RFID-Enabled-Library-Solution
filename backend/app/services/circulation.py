@@ -21,6 +21,7 @@ from app.services.catalog import CatalogService
 from app.services.common import Actor
 from app.services.fines import FinesService
 from app.services.members import MembersService
+from app.services.notifications import NotificationsService
 from app.services.policy import PolicyEngine
 
 REFUSAL_MESSAGES = {
@@ -213,6 +214,18 @@ class CirculationService:
         policy = self._policy(loan.member)
         days = PolicyEngine.days_overdue(loan.due_at, now)
         fine = self.fines.raise_overdue(loan, PolicyEngine.overdue_fine(days, policy.fine_per_day), actor)
+        notifier = NotificationsService(self.session)
+        if fine and notifier.setting("overdue_notices_enabled", True):
+            notifier.queue_for_member(
+                loan.member,
+                "overdue_notice",
+                {
+                    "title": item.bib.title,
+                    "accession_no": item.accession_no,
+                    "days": days,
+                    "amount": fine.amount,
+                },
+            )
         self.session.flush()
         self._audit(
             actor,

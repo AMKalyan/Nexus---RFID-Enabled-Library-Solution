@@ -1,4 +1,7 @@
+import asyncio
+import contextlib
 import logging
+from collections.abc import AsyncIterator
 
 from alembic.runtime.migration import MigrationContext
 from fastapi import FastAPI, Request
@@ -13,6 +16,7 @@ from app.api.v1 import (
     circulation,
     devices,
     fines,
+    gate,
     health,
     inventory,
     members,
@@ -43,10 +47,25 @@ def _database_check(app: FastAPI) -> tuple[str, bool]:
         return "database", False
 
 
+@contextlib.asynccontextmanager
+async def _with_worker(_: FastAPI) -> AsyncIterator[None]:
+    """Run the notification outbox worker for the lifetime of the API process."""
+    from app.worker import run_forever
+
+    stop = asyncio.Event()
+    task = asyncio.create_task(run_forever(stop))
+    try:
+        yield
+    finally:
+        stop.set()
+        await task
+
+
 def create_app(check_db: bool = True) -> FastAPI:
     settings = get_settings()
     configure_logging(settings.log_level)
     app = FastAPI(
+        lifespan=_with_worker if check_db and settings.run_worker else None,
         title="Nexus API",
         version=settings.app_version,
         docs_url="/api/docs",
@@ -75,6 +94,7 @@ def create_app(check_db: bool = True) -> FastAPI:
     app.include_router(devices.router, prefix="/api/v1")
     app.include_router(tags.router, prefix="/api/v1")
     app.include_router(inventory.router, prefix="/api/v1")
+    app.include_router(gate.router, prefix="/api/v1")
     app.include_router(ws.router, prefix="/api/v1")
     return app
 

@@ -37,6 +37,7 @@ class Settings(BaseSettings):
     rate_limit_migration: str = "10/minute"
     upload_max_mb: int = 25
     sip2_listener_enabled: bool = False
+    run_worker: bool = True
     licence_file: str = "licence.json"
     licence_key: SecretStr = SecretStr("dev-licence-key")
 

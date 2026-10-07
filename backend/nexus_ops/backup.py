@@ -94,3 +94,61 @@ def run_restore(path: Path | str, url: str | None = None) -> None:
         proc = subprocess.run(cmd, stdin=dump, stderr=subprocess.PIPE, env=env, check=False)  # noqa: S603  # nosec B603
     if proc.returncode != 0:
         raise RuntimeError(f"pg_restore failed: {proc.stderr.decode(errors='replace').strip()[:500]}")
+
+
+def terminate_other_sessions(url: str | None = None) -> int:
+    """Close other connections to the database so a restore is not blocked by open sessions."""
+    from sqlalchemy import create_engine, text
+
+    engine = create_engine(url or os.environ.get("OPS_DATABASE_URL") or get_settings().owner_database_url)
+    try:
+        with engine.begin() as conn:
+            query = text(
+                "SELECT pg_terminate_backend(pid) FROM pg_stat_activity "
+                "WHERE datname = current_database() AND pid <> pg_backend_pid()"
+            )
+            rows = conn.execute(query).all()
+        return len(rows)
+    finally:
+        engine.dispose()
+
+
+def main() -> None:
+    import argparse
+    import json
+
+    from nexus_ops import integrity
+
+    parser = argparse.ArgumentParser(
+        prog="python -m nexus_ops.backup", description="Nexus backup and restore"
+    )
+    sub = parser.add_subparsers(dest="cmd", required=True)
+    create = sub.add_parser("create", help="take a verified logical backup")
+    create.add_argument("--reason", default="manual")
+    sub.add_parser("list", help="list backups in the backup folder")
+    restore = sub.add_parser("restore", help="restore a backup (stop the API first)")
+    restore.add_argument("file")
+    restore.add_argument("--yes", action="store_true", help="do not ask for confirmation")
+    args = parser.parse_args()
+
+    if args.cmd == "create":
+        path = run_backup(args.reason)
+        print(f"backup: {path}\nsha256: {sha256_file(path)}")
+    elif args.cmd == "list":
+        for p in sorted(backup_dir().glob("*.dump")):
+            print(f"{p.name}  {p.stat().st_size:,} bytes")
+    else:
+        path = Path(args.file) if Path(args.file).is_absolute() else backup_dir() / args.file
+        verify(path)
+        if not args.yes and input(f"Replace the current database with {path.name}? [y/N] ").lower() != "y":
+            raise SystemExit("cancelled")
+        before = integrity.snapshot()
+        closed = terminate_other_sessions()
+        run_restore(path)
+        after = integrity.snapshot()
+        print(f"restored {path.name} (closed {closed} other session(s))")
+        print(json.dumps({"legacy_tables_changed_by_restore": integrity.compare(before, after)}))
+
+
+if __name__ == "__main__":
+    main()

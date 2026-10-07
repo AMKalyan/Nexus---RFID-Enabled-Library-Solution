@@ -27,8 +27,13 @@ def test_fr10_generator_is_deterministic(tmp_path):
 def test_fr10_every_defect_kind_is_injected(tmp_path):
     m = generate(tmp_path / "s.xlsx", rows=2000, seed=3)
     assert set(m.defects.values()) == {
-        "TITLE_MISSING", "ISBN_CHECKSUM", "YEAR_RANGE", "ACCESSION_FORMAT", "ITEM_TYPE_UNKNOWN", "PRICE_NEGATIVE",
-    }  # fmt: skip
+        "TITLE_MISSING",
+        "ISBN_CHECKSUM",
+        "YEAR_RANGE",
+        "ACCESSION_FORMAT",
+        "ITEM_TYPE_UNKNOWN",
+        "PRICE_NEGATIVE",
+    }
 
 
 def test_fr10_exact_duplicates_repeat_an_earlier_row(tmp_path):

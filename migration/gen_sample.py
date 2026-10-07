@@ -19,9 +19,21 @@ from faker import Faker
 from openpyxl import Workbook
 
 HEADERS = [
-    "Accession No", "Barcode", "Title", "Author", "ISBN", "Publisher", "Year", "Edition", "Subjects",
-    "Call No", "Shelf", "Item Type", "Price", "Acquired On",
-]  # fmt: skip
+    "Accession No",
+    "Barcode",
+    "Title",
+    "Author",
+    "ISBN",
+    "Publisher",
+    "Year",
+    "Edition",
+    "Subjects",
+    "Call No",
+    "Shelf",
+    "Item Type",
+    "Price",
+    "Acquired On",
+]
 DEFECTS = [
     "TITLE_MISSING",
     "ISBN_CHECKSUM",
@@ -30,8 +42,16 @@ DEFECTS = [
     "ITEM_TYPE_UNKNOWN",
     "PRICE_NEGATIVE",
 ]
-SHELVES = [("A-01", 0, 199), ("A-02", 200, 299), ("B-01", 300, 399), ("B-02", 400, 499),
-           ("C-01", 500, 599), ("C-02", 600, 699), ("D-01", 700, 799), ("D-02", 800, 999)]  # fmt: skip
+SHELVES = [
+    ("A-01", 0, 199),
+    ("A-02", 200, 299),
+    ("B-01", 300, 399),
+    ("B-02", 400, 499),
+    ("C-01", 500, 599),
+    ("C-02", 600, 699),
+    ("D-01", 700, 799),
+    ("D-02", 800, 999),
+]
 EXCEL_EPOCH = date(1899, 12, 30)
 FIRST_ACCESSION = 100001  # keeps clear of the seeded legacy range ACC-000001…
 
@@ -109,8 +129,9 @@ def _break(row: list, defect: str) -> list:
     return row
 
 
-def generate(path: Path | str, rows: int = 20000, invalid_rate: float = 0.03, dup_rate: float = 0.02,
-             seed: int = 42) -> Manifest:  # fmt: skip
+def generate(
+    path: Path | str, rows: int = 20000, invalid_rate: float = 0.03, dup_rate: float = 0.02, seed: int = 42
+) -> Manifest:
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     fake = Faker("en_IN")
@@ -176,8 +197,10 @@ def main() -> None:
     parser.add_argument("--seed", type=int, default=42)
     args = parser.parse_args()
     m = generate(args.out, rows=args.rows, seed=args.seed)
-    print(f"{args.out}: {m.rows} rows, {len(m.invalid_rows)} invalid, {len(m.exact_duplicate_rows)} exact "
-          f"duplicates, {len(m.likely_duplicate_rows)} likely duplicates")  # fmt: skip
+    print(
+        f"{args.out}: {m.rows} rows, {len(m.invalid_rows)} invalid, {len(m.exact_duplicate_rows)} exact "
+        f"duplicates, {len(m.likely_duplicate_rows)} likely duplicates"
+    )
 
 
 if __name__ == "__main__":

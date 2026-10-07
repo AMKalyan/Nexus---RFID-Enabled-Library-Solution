@@ -10,7 +10,7 @@ A running record of delivery against the SOP §9 stages. It is updated at every 
 | 2 Requirements & design | Day 1 (2026-10-04) | 2026-10-04 | `sop-stage-2` |
 | 3 Foundation build | Day 1 (2026-10-04) | 2026-10-05 | `sop-stage-3` |
 | 4 Core library functions | Day 2 (2026-10-05) AM | 2026-10-07 | `sop-stage-4` |
-| 5 RFID middleware & integrations | Day 2 midday | — | `sop-stage-5` |
+| 5 RFID middleware & integrations | Day 2 midday | 2026-10-07 | `sop-stage-5` |
 | 6 Migration & resilience | Day 2 afternoon | — | `sop-stage-6` |
 | 7 Verification | Day 2 evening | — | `sop-stage-7` |
 | Release & handover (D9–D10) | Day 2 evening | — | `v1.0.0-eval` |
@@ -46,4 +46,9 @@ A running record of delivery against the SOP §9 stages. It is updated at every 
 - Manual user journeys recorded in `docs/06-testing/user-journeys.md`; DEF-004 closed.
 - Stage 4 gate approved, merged and tagged `sop-stage-4`.
 
-**Next task:** Task 12 of `implementation-plan.md` (device registry, event ingest, dispatcher, command bus, live hub) on `stage/5-rfid`.
+- Stage 4 merged and tagged `sop-stage-4`.
+- Stage 5 Tasks 12–20: RFID middleware (ingest, dispatcher, command bus, live hub); tagging; handheld inventory; gate, CCTV and notification outbox; smart-card login; NCIP 2.0 subset and SIP2 boundary; device simulator; RFID screens. 189 backend, 6 simulator and 8 frontend tests passing (90% backend coverage).
+- Simulator rehearsal of AC 02, 05, 06 and 07 recorded in `docs/06-testing/user-journeys.md` (UJ-07..11).
+- Stage 5 gate approved, merged and tagged `sop-stage-5`.
+
+**Next task:** Task 21 of `implementation-plan.md` (synthetic 20k spreadsheet generator and profiler) on `stage/6-migration`.

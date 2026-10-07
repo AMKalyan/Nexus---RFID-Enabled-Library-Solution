@@ -29,7 +29,9 @@ Status values: Open, In progress, Done, Deferred.
 | NX-030 | Core library functions | stage-4, FR-01, FR-02, FR-04, FR-08 | Stage 4 | Done | Stage 4 merge |
 | NX-031 | Administration API and screens | stage-4, FR-11 | Stage 4 | Done | Stage 4 merge |
 | NX-032 | Charting library deprecation warnings (DEF-004) | stage-4, defect | Stage 4 | Done | Stage 4 merge |
-| NX-040 | RFID middleware and integrations | stage-5, FR-03, FR-05, FR-06, FR-07, FR-09 | Stage 5 | Open | |
+| NX-040 | RFID middleware and integrations | stage-5, FR-03, FR-05, FR-06, FR-07, FR-09 | Stage 5 | Done | Stage 5 merge |
+| NX-041 | Device simulator (CLI, panel, offline queue) | stage-5, FR-03, FR-07 | Stage 5 | Done | Stage 5 merge |
+| NX-042 | Static-analysis findings in SIP2 listener and NCIP builder | stage-5, NFR-02 | Stage 5 | Done | Stage 5 merge |
 | NX-050 | Migration and resilience | stage-6, FR-10, NFR-01 | Stage 6 | Open | |
 | NX-060 | Verification | stage-7, NFR-05 | Stage 7 | Open | |
 | NX-070 | Release, deployment package, operational docs, demonstration | release, FR-12 | Release | Open | |

@@ -286,3 +286,54 @@ def committed_world(migrated_db):
         c.execute(delete(StaffUser).where(StaffUser.id == ids.clerk))
     owner.dispose()
     engine.dispose()
+
+
+@pytest.fixture
+def activity_world(db_session):
+    """Known activity for dashboard/report assertions."""
+    from datetime import UTC, datetime, timedelta
+    from decimal import Decimal
+    from types import SimpleNamespace
+
+    from app.db.models import LoanChannel
+    from tests.factories import (
+        make_bib,
+        make_device,
+        make_fine,
+        make_gate_event,
+        make_item,
+        make_loan,
+        make_member,
+        make_tag,
+    )
+
+    make_device(db_session, "GATE-01", "gate")
+    make_device(db_session, "HH-01", "handheld")
+    tagged = [make_item(db_session, make_bib(db_session, title=f"Tagged {n}")) for n in range(10)]
+    for item in tagged:
+        make_tag(db_session, item)
+    for n in range(5):
+        make_item(db_session, make_bib(db_session, title=f"Untagged {n}"))
+    members = [make_member(db_session) for _ in range(3)]
+    loans = []
+    for n, item in enumerate(tagged[:6]):
+        loan = make_loan(db_session, item, members[n % 3], days_ago=20 if n < 2 else 1)
+        if n in (2, 3):
+            loan.channel = LoanChannel.ncip
+        loans.append(loan)
+    for amount in ("12.00", "4.50", "3.50"):
+        make_fine(db_session, members[0], amount)
+    make_gate_event(db_session, tagged[7], alarm=True)
+    make_gate_event(db_session, tagged[8], alarm=True)
+    make_gate_event(db_session, tagged[9], alarm=False)
+    old = make_gate_event(db_session, tagged[9], alarm=False)
+    old.occurred_at = datetime.now(UTC) - timedelta(days=3)
+    db_session.flush()
+    return SimpleNamespace(
+        tagged=10,
+        untagged=5,
+        active_loans=6,
+        overdue_loans=2,
+        alarms_today=2,
+        open_fines_total=str(Decimal("20.00")),
+    )

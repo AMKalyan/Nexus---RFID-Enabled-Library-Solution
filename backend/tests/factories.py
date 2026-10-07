@@ -11,8 +11,11 @@ from sqlalchemy.orm import Session
 from app.core.security import hash_password
 from app.db.models import (
     Bib,
+    Device,
+    DeviceType,
     Fine,
     FineReason,
+    GateEvent,
     Item,
     ItemStatus,
     ItemType,
@@ -141,3 +144,44 @@ def make_fine(session: Session, member: Member, amount: str) -> Fine:
     session.add(fine)
     session.flush()
     return fine
+
+
+def make_device(session: Session, code: str, device_type: str, config: dict | None = None) -> Device:
+    """Device with a known raw key exposed as .raw_key (stored hashed)."""
+    import hashlib
+
+    raw = f"key-{code}-{uuid.uuid4().hex[:8]}"
+    device = session.get(Device, code)
+    if device is None:
+        device = Device(
+            code=code,
+            device_type=DeviceType(device_type),
+            name=code,
+            location="Test",
+            config=config or {},
+            api_key_hash=hashlib.sha256(raw.encode()).hexdigest(),
+        )
+        session.add(device)
+    else:
+        device.api_key_hash = hashlib.sha256(raw.encode()).hexdigest()
+        device.config = config or device.config
+    session.flush()
+    device.raw_key = raw
+    return device
+
+
+def make_gate_event(session: Session, item: Item, alarm: bool, hours_ago: int = 0) -> GateEvent:
+    event = GateEvent(
+        device_code="GATE-01",
+        event_id=uuid.uuid4(),
+        epc="E280TEST",
+        item_id=item.id,
+        accession_no=item.accession_no,
+        direction="out",
+        authorised=not alarm,
+        alarm=alarm,
+        occurred_at=datetime.now(UTC) - timedelta(hours=hours_ago),
+    )
+    session.add(event)
+    session.flush()
+    return event

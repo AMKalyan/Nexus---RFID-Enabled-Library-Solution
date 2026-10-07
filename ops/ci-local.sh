@@ -12,8 +12,8 @@ echo "== backend: format, lint, types, static analysis, dependencies, tests"
 cd "$ROOT/backend"
 "$PY" -m ruff format --check .
 "$PY" -m ruff check .
-"$PY" -m mypy app
-"$PY" -m bandit -q -r app -x app/db/migrations -f txt -o "$REPORTS/bandit.txt" || { cat "$REPORTS/bandit.txt"; exit 1; }
+"$PY" -m mypy app nexus_ops
+"$PY" -m bandit -q -r app nexus_ops -x app/db/migrations -f txt -o "$REPORTS/bandit.txt" || { cat "$REPORTS/bandit.txt"; exit 1; }
 "$PY" -m pip_audit -r requirements.txt --progress-spinner off > "$REPORTS/pip-audit.txt" 2>&1 || { cat "$REPORTS/pip-audit.txt"; exit 1; }
 "$PY" -m pytest -q --cov=app --cov-report=term --junitxml="$REPORTS/junit.xml" | tee "$REPORTS/pytest.txt"
 

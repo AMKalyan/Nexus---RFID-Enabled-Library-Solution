@@ -15,7 +15,11 @@ cd "$ROOT/backend"
 "$PY" -m mypy app nexus_ops
 "$PY" -m bandit -q -r app nexus_ops -x app/db/migrations -f txt -o "$REPORTS/bandit.txt" || { cat "$REPORTS/bandit.txt"; exit 1; }
 "$PY" -m pip_audit -r requirements.txt --progress-spinner off > "$REPORTS/pip-audit.txt" 2>&1 || { cat "$REPORTS/pip-audit.txt"; exit 1; }
-"$PY" -m pytest -q --cov=app --cov-report=term --junitxml="$REPORTS/junit.xml" | tee "$REPORTS/pytest.txt"
+# Capture pytest's own exit status: piping into tee would report tee's status and hide failing tests (DEF-011).
+status=0
+"$PY" -m pytest -q --cov=app --cov-report=term --junitxml="$REPORTS/junit.xml" > "$REPORTS/pytest.txt" 2>&1 || status=$?
+cat "$REPORTS/pytest.txt"
+[ "$status" -eq 0 ] || { echo "== backend tests failed (exit $status)"; exit "$status"; }
 
 echo "== device simulator: tests"
 cd "$ROOT/device-sim"

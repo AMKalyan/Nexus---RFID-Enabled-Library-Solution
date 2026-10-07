@@ -21,6 +21,7 @@ from app.api.v1 import (
     inventory,
     members,
     migration,
+    ncip,
     opac,
     reports,
     tags,
@@ -50,16 +51,25 @@ def _database_check(app: FastAPI) -> tuple[str, bool]:
 
 @contextlib.asynccontextmanager
 async def _with_worker(_: FastAPI) -> AsyncIterator[None]:
-    """Run the notification outbox worker for the lifetime of the API process."""
+    """Background services for the lifetime of the API process: outbox worker and optional SIP2 listener."""
     from app.worker import run_forever
 
+    settings = get_settings()
     stop = asyncio.Event()
     task = asyncio.create_task(run_forever(stop))
+    sip2 = None
+    if settings.sip2_listener_enabled:
+        from app.interop.sip2_server import start
+
+        sip2 = await start("0.0.0.0", settings.sip2_port, set(settings.sip2_allowed_hosts))  # noqa: S104
     try:
         yield
     finally:
         stop.set()
         await task
+        if sip2 is not None:
+            sip2.close()
+            await sip2.wait_closed()
 
 
 def create_app(check_db: bool = True) -> FastAPI:
@@ -97,6 +107,7 @@ def create_app(check_db: bool = True) -> FastAPI:
     app.include_router(inventory.router, prefix="/api/v1")
     app.include_router(gate.router, prefix="/api/v1")
     app.include_router(migration.router, prefix="/api/v1")
+    app.include_router(ncip.router, prefix="/api/v1")
     app.include_router(ws.router, prefix="/api/v1")
     return app
 

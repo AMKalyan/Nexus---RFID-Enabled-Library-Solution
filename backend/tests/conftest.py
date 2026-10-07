@@ -415,3 +415,20 @@ def shelf_world(db_session):
     a_items, a_epcs = stock("A-01", 6)
     b_items, b_epcs = stock("B-01", 3)
     return SimpleNamespace(a01_items=a_items, a01_epcs=a_epcs, b01_items=b_items, b01_epcs=b_epcs)
+
+
+@pytest.fixture
+def agency(db_session):
+    """NCIP agency (e.g. a self-check kiosk) with a known key exposed as .raw_key."""
+    import hashlib
+
+    from app.db.models import Agency
+
+    raw = "agency-key-for-tests"
+    row = Agency(
+        code="KIOSK-01", name="Self-check kiosk", api_key_hash=hashlib.sha256(raw.encode()).hexdigest()
+    )
+    db_session.add(row)
+    db_session.flush()
+    row.raw_key = raw
+    return row

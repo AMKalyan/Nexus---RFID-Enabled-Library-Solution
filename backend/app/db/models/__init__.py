@@ -13,6 +13,7 @@ from app.db.models.catalog import (
 )
 from app.db.models.circulation import Fine, FineReason, FineStatus, Loan, LoanChannel
 from app.db.models.devices import (
+    Agency,
     Device,
     DeviceEvent,
     DeviceType,
@@ -30,6 +31,7 @@ from app.db.models.ops import AppSetting, AppVersion, AuditLog, BatchStatus, Mig
 from app.db.models.staging import ImportRow, ImportStatus
 
 __all__ = [
+    "Agency",
     "AppSetting", "AppVersion", "AuditLog", "BatchStatus", "Bib", "Channel", "CircPolicy", "Device",
     "DeviceEvent", "DeviceType", "Fine", "FineReason", "FineStatus", "Footfall", "GateEvent", "ImportRow",
     "ImportStatus", "InventoryRead", "InventoryResult", "InventorySession", "Item", "ItemStatus", "ItemType",

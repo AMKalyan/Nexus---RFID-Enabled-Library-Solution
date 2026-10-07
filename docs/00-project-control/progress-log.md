@@ -25,7 +25,7 @@ A running record of delivery against the SOP §9 stages. It is updated at every 
 ## Resume checklist (next session)
 1. `git status` and `git log --oneline --decorate -10`: confirm you're on the expected branch and see the last tag.
 2. Read the "Next task" line below and the matching task in `implementation-plan.md`.
-3. From Stage 3 onwards: `docker compose up -d`, then run the test suite to confirm a green baseline before continuing.
+3. From Stage 3 onwards: `docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d` (the dev override is required with the local dev passwords, DEF-009), then run the test suite to confirm a green baseline before continuing.
 
 - Stage 1 merged and tagged `sop-stage-1`.
 - Stage 2 on `stage/2-design`: use cases, data dictionary, architecture, database, interface and security designs, ADR-0001..0005, design review, implementation plan.

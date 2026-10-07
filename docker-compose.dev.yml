@@ -1,4 +1,8 @@
-# Development override: exposes PostgreSQL on localhost:5433 for local test runs.
+# Development override: exposes PostgreSQL on localhost:5433 for local test runs, and runs the API in
+# development mode so the fixed local database passwords are accepted (production refuses them, DEF-009).
 services:
   db:
     ports: ["5433:5432"]
+  api:
+    environment:
+      ENVIRONMENT: dev

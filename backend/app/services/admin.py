@@ -45,6 +45,7 @@ SETTINGS = {
     "gate_alert_recipients": _email_list,
     "library_name": _short_text,
     "ui_banner": _short_text,
+    "maintenance_notice": _short_text,
     "overdue_notices_enabled": _flag,
 }
 

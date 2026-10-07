@@ -1,5 +1,15 @@
 # Release Notes
 
+## 1.0.1 (2026-10-08)
+
+Maintenance release used to prove the offline update and rollback path (AC 09).
+
+- `/api/v1/version` reports `build_notes`.
+- New administrator setting `maintenance_notice` (migration `0004`). The downgrade removes only this setting and the 1.0.1 release record.
+- Update with `ops/update.ps1 nexus-1.0.1.zip` (or `update.sh`); roll back with `ops/rollback.ps1`.
+
+Schema revision: `0004`.
+
 ## 1.0.0 (2026-10-08)
 
 First release of the Nexus RFID library solution prototype. All acceptance scenarios AC 01–AC 10 are demonstrable against mocked devices and services.

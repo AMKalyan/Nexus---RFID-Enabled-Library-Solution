@@ -2,6 +2,8 @@
 
 import random
 import uuid
+from datetime import UTC, datetime, timedelta
+from decimal import Decimal
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -9,15 +11,21 @@ from sqlalchemy.orm import Session
 from app.core.security import hash_password
 from app.db.models import (
     Bib,
+    Fine,
+    FineReason,
     Item,
     ItemStatus,
     ItemType,
+    Loan,
+    LoanChannel,
     Member,
     MemberStatus,
     RecordSource,
+    RfidTag,
     Role,
     Shelf,
     StaffUser,
+    TagTarget,
 )
 
 DEFAULT_PASSWORD = "Passw0rd!x"
@@ -99,3 +107,37 @@ def make_item(
     session.add(item)
     session.flush()
     return item
+
+
+def make_tag(session: Session, item: Item, epc: str | None = None, security_bit: bool = True) -> RfidTag:
+    tag = RfidTag(
+        epc=epc or "E280" + uuid.uuid4().hex[:20].upper(),
+        target_type=TagTarget.item,
+        item_id=item.id,
+        security_bit=security_bit,
+    )
+    session.add(tag)
+    session.flush()
+    return tag
+
+
+def make_loan(session: Session, item: Item, member: Member, days_ago: int = 1, loan_days: int = 14) -> Loan:
+    issued = datetime.now(UTC) - timedelta(days=days_ago)
+    loan = Loan(
+        item_id=item.id,
+        member_id=member.id,
+        issued_at=issued,
+        due_at=issued + timedelta(days=loan_days),
+        channel=LoanChannel.ui,
+    )
+    item.status = ItemStatus.on_loan
+    session.add(loan)
+    session.flush()
+    return loan
+
+
+def make_fine(session: Session, member: Member, amount: str) -> Fine:
+    fine = Fine(member_id=member.id, amount=Decimal(amount), reason=FineReason.manual)
+    session.add(fine)
+    session.flush()
+    return fine

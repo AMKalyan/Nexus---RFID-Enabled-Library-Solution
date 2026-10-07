@@ -183,3 +183,101 @@ export async function download(path: string, filename: string): Promise<void> {
 
 export const fmtDate = (iso: string | null) => (iso ? new Date(iso).toLocaleString() : "—");
 export const fmtDay = (iso: string | null) => (iso ? new Date(iso).toLocaleDateString() : "—");
+
+// --- RFID ---------------------------------------------------------------------------------------------
+
+export type TagDetail = Tag & {
+  target_type: "item" | "member";
+  retire_reason: string | null;
+  item: { id: string; accession_no: string; title: string; status: string } | null;
+  member: { id: string; card_no: string } | null;
+};
+export type InventoryReadRow = {
+  epc: string;
+  result: "found" | "misplaced" | "unknown";
+  item_id: string | null;
+  accession_no: string | null;
+  title: string | null;
+  home_shelf: string | null;
+  light: "green" | "amber" | "red";
+  beep: "ok" | "warn" | "error";
+};
+export type InventorySession = {
+  id: string;
+  shelf_code: string;
+  device_code: string;
+  status: "open" | "closed";
+  expected: number;
+  reads: InventoryReadRow[];
+};
+export type MissingRow = { epc: string; item_id: string; accession_no: string; title: string };
+export type InventoryReport = {
+  id: string;
+  shelf_code: string;
+  found: InventoryReadRow[];
+  misplaced: InventoryReadRow[];
+  unknown: InventoryReadRow[];
+  missing: MissingRow[];
+};
+export type GateEvent = {
+  id: string;
+  device_code: string;
+  epc: string;
+  accession_no: string | null;
+  direction: string;
+  authorised: boolean;
+  alarm: boolean;
+  offline_decision: boolean;
+  notified: boolean;
+  has_photo: boolean;
+  occurred_at: string;
+};
+export type Device = {
+  code: string;
+  device_type: string;
+  name: string;
+  location: string | null;
+  ip_address: string | null;
+  status: "online" | "offline";
+  last_heartbeat_at: string | null;
+};
+export type OutboxRow = {
+  id: string;
+  channel: string;
+  recipient: string;
+  template: string;
+  subject: string | null;
+  status: string;
+  attempts: number;
+  last_error: string | null;
+  created_at: string;
+  sent_at: string | null;
+};
+
+export const tags = {
+  associate: (body: { epc: string; target_type: "item" | "member"; item_id?: string; member_id?: string }) =>
+    post<TagDetail>("/tags", body),
+  get: (epc: string) => api<TagDetail>(`/tags/${encodeURIComponent(epc)}`),
+  retire: (epc: string, reason: string) => post<TagDetail>(`/tags/${encodeURIComponent(epc)}/retire`, { reason }),
+};
+
+export const inventory = {
+  start: (shelf_code: string, device_code: string) => post<InventorySession>("/inventory/sessions", { shelf_code, device_code }),
+  get: (id: string) => api<InventorySession>(`/inventory/sessions/${id}`),
+  close: (id: string) => post<InventoryReport>(`/inventory/sessions/${id}/close`),
+  markMissing: (id: string) => post<{ marked: number }>(`/inventory/sessions/${id}/mark-missing`),
+};
+
+export const gate = {
+  events: (alarmOnly: boolean) => api<GateEvent[]>(`/gate/events${qs({ alarm: alarmOnly ? true : undefined })}`),
+  photoUrl: async (id: string): Promise<string> => {
+    const res = await fetch(`/api/v1/gate/events/${id}/photo`, {
+      headers: getTokens() ? { Authorization: `Bearer ${getTokens()!.access_token}` } : {},
+    });
+    if (!res.ok) throw new Error("No snapshot");
+    return URL.createObjectURL(await res.blob());
+  },
+};
+
+export const devices = { list: () => api<Device[]>("/devices") };
+export const notifications = { outbox: (status?: string) => api<OutboxRow[]>(`/notifications/outbox${qs({ status })}`) };

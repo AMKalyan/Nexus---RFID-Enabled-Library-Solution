@@ -173,17 +173,14 @@ class Simulator:
         return self._token
 
     def shelf_epcs(self, shelf: str) -> list[str]:
+        """Active tags whose item lives on this shelf and is not on loan (one report call)."""
         headers = {"Authorization": f"Bearer {self.staff_token()}"}
-        spines = self.http.get(f"{self.api}/opac/shelves/{shelf}").json()
-        epcs = []
-        for spine in spines:
-            items = self.http.get(
-                f"{self.api}/items", params={"accession_no": spine["accession_no"]}, headers=headers
-            )
-            for item in items.json():
-                if item.get("active_tag") and item["status"] != "on_loan":
-                    epcs.append(item["active_tag"]["epc"])
-        return epcs
+        params = {"shelf_code": shelf, "tag_status": "active"}
+        report = self.http.get(f"{self.api}/reports/tagged-items", params=params, headers=headers)
+        report.raise_for_status()
+        body = report.json()
+        epc, bit = body["columns"].index("epc"), body["columns"].index("security_bit")
+        return [row[epc] for row in body["rows"] if row[bit]]  # security bit off = on loan
 
     # device actions
     def tap(self, reader: str, uid: str) -> str:

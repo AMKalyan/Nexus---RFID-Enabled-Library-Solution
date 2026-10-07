@@ -8,7 +8,10 @@ import { AdminPage } from "./pages/AdminPage";
 import { AuditPage } from "./pages/AuditPage";
 import { CataloguePage } from "./pages/CataloguePage";
 import { CirculationDeskPage } from "./pages/CirculationDeskPage";
+import { DevicesPage } from "./pages/DevicesPage";
+import { GateMonitorPage } from "./pages/GateMonitorPage";
 import { HealthPage } from "./pages/HealthPage";
+import { InventoryPage } from "./pages/InventoryPage";
 import { ItemPage } from "./pages/ItemPage";
 import { LoginPage } from "./pages/LoginPage";
 import { MembersPage } from "./pages/MembersPage";
@@ -16,6 +19,7 @@ import { MyLoansPage } from "./pages/MyLoansPage";
 import { OpacPage } from "./pages/OpacPage";
 import { ReportsPage } from "./pages/ReportsPage";
 import { ShelfPage } from "./pages/ShelfPage";
+import { TaggingPage } from "./pages/TaggingPage";
 
 // Charts are loaded only when the dashboard is opened.
 const DashboardPage = lazy(() => import("./pages/DashboardPage").then((m) => ({ default: m.DashboardPage })));
@@ -50,6 +54,10 @@ export default function App() {
               <Route path="/catalogue" element={<CataloguePage />} />
               <Route path="/items/:id" element={<ItemPage />} />
               <Route path="/members" element={<MembersPage />} />
+              <Route path="/tagging" element={<TaggingPage />} />
+              <Route path="/inventory" element={<InventoryPage />} />
+              <Route path="/gate" element={<GateMonitorPage />} />
+              <Route path="/devices" element={<DevicesPage />} />
               <Route path="/reports" element={<ReportsPage />} />
               <Route path="/audit" element={<AuditPage />} />
               <Route path="/admin" element={<AdminPage />} />

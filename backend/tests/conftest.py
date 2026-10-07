@@ -58,3 +58,63 @@ def db_session(app_conn) -> Iterator[Session]:
     s = Session(bind=app_conn, join_transaction_mode="create_savepoint")
     yield s
     s.close()
+
+
+# --- API fixtures -----------------------------------------------------------------------------------
+
+
+@pytest.fixture
+def client(db_session):
+    from fastapi.testclient import TestClient
+
+    from app.core.ratelimit import limiter
+    from app.db.base import get_session
+    from app.main import create_app
+
+    app = create_app(check_db=False)
+    app.dependency_overrides[get_session] = lambda: db_session
+    limiter.reset()
+    return TestClient(app)
+
+
+@pytest.fixture
+def auth_headers(db_session):
+    """auth_headers("Librarian") -> bearer header for a fresh staff user with that role."""
+    from app.core.security import create_access_token
+    from tests.factories import make_staff
+
+    def make(role: str) -> dict[str, str]:
+        user = make_staff(db_session, role)
+        return {"Authorization": f"Bearer {create_access_token(user.id, 'staff', role)}"}
+
+    return make
+
+
+@pytest.fixture
+def make_bib(db_session):
+    from tests.factories import make_bib as _make_bib
+
+    return lambda **kw: _make_bib(db_session, **kw)
+
+
+@pytest.fixture
+def sample_item(db_session):
+    from tests.factories import make_bib, make_item
+
+    return make_item(db_session, make_bib(db_session, title="Sample Title", author="Sample Author"))
+
+
+@pytest.fixture
+def withdrawn_item(db_session):
+    from app.db.models import ItemStatus
+    from tests.factories import make_bib, make_item
+
+    return make_item(db_session, make_bib(db_session, title="Old Book"), status=ItemStatus.withdrawn)
+
+
+@pytest.fixture
+def sample_shelf_items(db_session):
+    from tests.factories import make_bib, make_item
+
+    call_nos = ["004.20 RAO", "001.10 IYE", "005.75 KUM", "003.00 DAS", "002.50 MEH"]
+    return [make_item(db_session, make_bib(db_session, title=f"Book {c}"), call_no=c) for c in call_nos]

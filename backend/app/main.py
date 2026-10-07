@@ -6,7 +6,7 @@ from fastapi.responses import JSONResponse
 from slowapi.errors import RateLimitExceeded
 from sqlalchemy import select
 
-from app.api.v1 import auth, health
+from app.api.v1 import auth, catalog, health, opac
 from app.core.config import get_settings
 from app.core.errors import install_error_handlers
 from app.core.logging import configure_logging
@@ -50,6 +50,8 @@ def create_app(check_db: bool = True) -> FastAPI:
 
     app.include_router(health.router, prefix="/api/v1")
     app.include_router(auth.router, prefix="/api/v1")
+    app.include_router(catalog.router, prefix="/api/v1")
+    app.include_router(opac.router, prefix="/api/v1")
     return app
 
 

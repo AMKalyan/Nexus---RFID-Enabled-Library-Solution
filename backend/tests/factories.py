@@ -7,7 +7,18 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.core.security import hash_password
-from app.db.models import Member, MemberStatus, Role, StaffUser
+from app.db.models import (
+    Bib,
+    Item,
+    ItemStatus,
+    ItemType,
+    Member,
+    MemberStatus,
+    RecordSource,
+    Role,
+    Shelf,
+    StaffUser,
+)
 
 DEFAULT_PASSWORD = "Passw0rd!x"
 
@@ -48,3 +59,43 @@ def make_member(
     session.add(member)
     session.flush()
     return member
+
+
+def ensure_shelf(session: Session, code: str = "A-01") -> Shelf:
+    shelf = session.get(Shelf, code)
+    if shelf is None:
+        shelf = Shelf(code=code, name=f"Shelf {code}", location="Test hall")
+        session.add(shelf)
+        session.flush()
+    return shelf
+
+
+def make_bib(session: Session, title: str = "Test Title", **kw) -> Bib:
+    bib = Bib(title=title, source=RecordSource.nexus, **kw)
+    session.add(bib)
+    session.flush()
+    return bib
+
+
+def make_item(
+    session: Session,
+    bib: Bib,
+    shelf_code: str = "A-01",
+    item_type: ItemType = ItemType.lending,
+    status: ItemStatus = ItemStatus.available,
+    call_no: str | None = None,
+) -> Item:
+    ensure_shelf(session, shelf_code)
+    n = random.randint(100000, 999999)  # noqa: S311 (test data)
+    item = Item(
+        bib_id=bib.id,
+        accession_no=f"ACC-{n}",
+        barcode=f"BC{n:08d}",
+        call_no=call_no or "000.00 TST",
+        shelf_code=shelf_code,
+        item_type=item_type,
+        status=status,
+    )
+    session.add(item)
+    session.flush()
+    return item

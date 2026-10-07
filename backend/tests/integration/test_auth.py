@@ -1,21 +1,9 @@
 import pytest
-from fastapi.testclient import TestClient
 
-from app.core.ratelimit import limiter
-from app.db.base import get_session
 from app.db.models import Role
-from app.main import create_app
 from tests.factories import make_member, make_staff
 
 pytestmark = pytest.mark.db
-
-
-@pytest.fixture
-def client(db_session):
-    app = create_app(check_db=False)
-    app.dependency_overrides[get_session] = lambda: db_session
-    limiter.reset()
-    return TestClient(app)
 
 
 def _login(client, username, password="Passw0rd!x"):

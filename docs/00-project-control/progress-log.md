@@ -55,4 +55,8 @@ A running record of delivery against the SOP §9 stages. It is updated at every 
 - Live 20k run reconciled exactly against the generator manifest; batch rollback and restore rehearsed on the stack with legacy data IDENTICAL (`docs/05-data-migration/`). DEF-005 and DEF-006 closed.
 - Stage 6 gate approved, merged and tagged `sop-stage-6`.
 
-**Next task:** Task 25 of `implementation-plan.md` (full verification run and test-to-requirement matrix) on `stage/7-verification`.
+- Stage 7 Task 25 on `stage/7-verification`: API contract regression test; load test at 10 and 50 users; security scanners and live smoke checks; UAT of AC 01-08 and AC 10 with screenshots; generated test-to-requirement matrix; test plan and results. Run of record: 234 backend (92% coverage), 6 simulator, 5 migration-tool, 9 frontend tests passing; 83 acceptance tests passing.
+- Defects DEF-007 to DEF-014 raised. S2 defects DEF-009 (insecure defaults accepted outside development) and DEF-011 (local pipeline hid failures) fixed on `fix/` branches; DEF-008 (50-user latency) recorded as a known limitation; DEF-012 (one unexplained stall) mitigated with a fail-fast lock timeout.
+- The API image now defaults to production mode; local development uses `docker-compose.dev.yml`.
+
+**Next task:** Task 26 of `implementation-plan.md` (offline bundle, install, update and rollback, AC 09), then the Stage 7 gate (Task 25 Step 8).

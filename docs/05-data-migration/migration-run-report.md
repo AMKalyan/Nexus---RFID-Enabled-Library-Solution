@@ -50,3 +50,16 @@ The row-level CSV lists every rejected, duplicate and likely-duplicate row with 
 ## Performance note
 
 The first implementation used ORM bulk statements. It issued one round trip per few rows, and staging 2,000 rows took 21 s on the development host. Moving to core multi-row inserts and pipelined updates brought that to 2.8 s, and the full 20,000 rows to the 13.7 s above.
+
+## Batch rollback rehearsal
+
+A separate 50-row batch (accessions `ACC-900001`…`ACC-900050`) was committed and then rolled back on the same stack, so the 20,000-row batch stayed in place.
+
+| Step | Command | Result |
+|---|---|---|
+| 1. Fingerprint legacy data | `integrity.py snapshot --label rollback-before` | 3 tables, 4,677 rows |
+| 2. Stage, validate, commit | `nexus_migrate.py --file rollback-rehearsal.csv --commit` | Batch `7ea8c5b7…`: 50 valid, 50 committed, balanced; pre-migration backup taken. Catalogue items 21,577 → 21,627 |
+| 3. Roll back | `nexus_migrate.py --rollback 7ea8c5b7…` | Status `rolled_back`; 0 items and 0 bibs left for the batch; catalogue items back to 21,577 |
+| 4. Check other data | `SELECT count(*) … WHERE migration_batch_id = 'db7e5931…'` | 20,000-row batch untouched (19,200 items) |
+| 5. Audit | `nexus.audit_log` | `migration.commit` and `migration.rollback` recorded |
+| 6. Prove legacy data intact | `integrity.py compare` before and after | **IDENTICAL: 3 legacy tables, 4,677 rows** (exit code 0) |

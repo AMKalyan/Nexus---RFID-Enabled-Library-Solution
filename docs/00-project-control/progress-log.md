@@ -51,4 +51,8 @@ A running record of delivery against the SOP §9 stages. It is updated at every 
 - Simulator rehearsal of AC 02, 05, 06 and 07 recorded in `docs/06-testing/user-journeys.md` (UJ-07..11).
 - Stage 5 gate approved, merged and tagged `sop-stage-5`.
 
-**Next task:** Task 21 of `implementation-plan.md` (synthetic 20k spreadsheet generator and profiler) on `stage/6-migration`.
+- Stage 6 Tasks 21–24: synthetic 20k export generator and profiler; staged spreadsheet migration with validation, duplicate detection, reconciliation and batch rollback; verified backup, restore and legacy integrity checksums; D5 package. 214 backend (91% coverage), 6 simulator, 5 migration-tool and 8 frontend tests passing.
+- Live 20k run reconciled exactly against the generator manifest; batch rollback and restore rehearsed on the stack with legacy data IDENTICAL (`docs/05-data-migration/`). DEF-005 and DEF-006 closed.
+- Stage 6 gate record written; awaiting approval.
+
+**Next task:** Stage 6 gate approval, then Task 25 of `implementation-plan.md` (full verification run and test-to-requirement matrix) on `stage/7-verification`.

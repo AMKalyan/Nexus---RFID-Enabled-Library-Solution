@@ -63,8 +63,8 @@ def to_markdown(report: dict) -> str:
     lines += [
         "",
         "Observations to act on in the validation rules:",
-        "- Columns with mixed cell types (for example ISBN stored as both text and number, or dates stored as "
-        "Excel serial numbers) are normalised before validation.",
+        "- Columns with mixed cell types (for example ISBN stored as both text and number, or dates "
+        "stored as Excel serial numbers) are normalised before validation.",
         "- Repeated accession numbers indicate exact duplicates; they are excluded and reported.",
         "- Empty mandatory cells (title, accession number) are rejected with a reason code.",
     ]

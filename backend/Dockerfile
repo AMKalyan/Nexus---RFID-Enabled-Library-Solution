@@ -17,7 +17,7 @@ WORKDIR /app/backend
 COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY VERSION /app/VERSION
-COPY ops/integrity.py /app/ops/integrity.py
+COPY ops/integrity.py ops/licence.py /app/ops/
 COPY backend/ .
 RUN useradd -r -u 10001 nexus && mkdir -p /app/outbox /backups && chown -R nexus /app /backups
 USER nexus

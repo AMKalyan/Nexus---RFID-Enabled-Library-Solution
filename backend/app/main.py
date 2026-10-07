@@ -2,6 +2,7 @@ import asyncio
 import contextlib
 import logging
 from collections.abc import AsyncIterator
+from pathlib import Path
 
 from alembic.runtime.migration import MigrationContext
 from fastapi import FastAPI, Request
@@ -27,8 +28,9 @@ from app.api.v1 import (
     tags,
     ws,
 )
-from app.core.config import get_settings
+from app.core.config import DEV_ENVIRONMENTS, get_settings
 from app.core.errors import install_error_handlers
+from app.core.licence import ReadOnlyUntilLicensed, status_from_file
 from app.core.logging import configure_logging
 from app.core.ratelimit import limiter
 from app.db.base import engine
@@ -88,6 +90,12 @@ def create_app(check_db: bool = True) -> FastAPI:
         app.state.health_checks.append(lambda: _database_check(app))
         _database_check(app)
     install_error_handlers(app)
+    app.state.licence_status = status_from_file(
+        Path(settings.licence_file), settings.licence_key.get_secret_value()
+    )
+    if settings.environment not in DEV_ENVIRONMENTS and app.state.licence_status != "valid":
+        log.warning("licence %s: the API is read-only for non-administrators", app.state.licence_status)
+        app.add_middleware(ReadOnlyUntilLicensed, status=app.state.licence_status)
 
     @app.exception_handler(RateLimitExceeded)
     async def _rate_limited(_: Request, __: RateLimitExceeded) -> JSONResponse:

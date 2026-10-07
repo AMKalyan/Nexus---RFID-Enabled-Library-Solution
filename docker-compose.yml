@@ -25,11 +25,13 @@ services:
       OWNER_DATABASE_URL: postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
       BACKUP_DIR: /backups
       OUTBOX_DIR: /app/outbox
+      LICENCE_FILE: /app/licence/licence.json
     depends_on:
       db: { condition: service_healthy }
     volumes:
       - backups:/backups
       - outbox:/app/outbox
+      - ./licence:/app/licence:ro
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/health')"]
       interval: 10s

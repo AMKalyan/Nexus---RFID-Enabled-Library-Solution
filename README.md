@@ -50,4 +50,4 @@ cd frontend && npm ci && npm run dev                                            
 bash ops/ci-local.sh              # format, lint, types, bandit, dependency audits, tests, build
 ```
 
-The `docker-compose.dev.yml` override exposes PostgreSQL on `localhost:5433` for the test suite.
+The `docker-compose.dev.yml` override exposes PostgreSQL on `localhost:5433` for the test suite and runs the API with `ENVIRONMENT=dev`. Without it the API image runs in production mode and refuses to start with development or placeholder secrets.

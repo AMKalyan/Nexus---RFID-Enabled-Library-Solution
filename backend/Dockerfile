@@ -1,5 +1,5 @@
 FROM python:3.12.7-slim
-ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 ENVIRONMENT=production
 
 # pg_dump/pg_restore must match the server major version (16), so they come from the PostgreSQL apt repository.
 RUN apt-get update \

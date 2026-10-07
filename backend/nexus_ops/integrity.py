@@ -41,7 +41,8 @@ def snapshot_connection(conn: Connection) -> dict[str, dict[str, int | str]]:
         pk = [r[0] for r in conn.execute(_PK, {"qualified": qualified})]
         order = ", ".join(_quote(c) for c in pk) or "1"
         digest, rows = hashlib.sha256(), 0
-        query = text(f"SELECT row_to_json(t)::text FROM {qualified} AS t ORDER BY {order}")  # noqa: S608
+        # Identifiers come from the system catalogue and are quoted (ADR-0003); no user input here.
+        query = text(f"SELECT row_to_json(t)::text FROM {qualified} AS t ORDER BY {order}")  # noqa: S608  # nosec B608
         for (row,) in conn.execution_options(stream_results=True).execute(query):
             digest.update(row.encode())
             digest.update(b"\n")

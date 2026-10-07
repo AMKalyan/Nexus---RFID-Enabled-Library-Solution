@@ -5,7 +5,7 @@
 | SOP reference | §9 Stage 7 |
 | Branch | `stage/7-verification` |
 | Gate date | 2026-10-08 |
-| Outcome | Pending approval |
+| Outcome | Approved |
 
 ## Exit criteria (SOP §9 Stage 7 bullets)
 
@@ -53,4 +53,4 @@ ruff, mypy, bandit, pip-audit and npm audit are clean. The live security smoke c
 - **Licence files are HMAC-signed** (the site holds the key). An asymmetric signature is in the production backlog.
 
 ## Decision
-Pending approval. Release and handover (D7–D9) start from `main` once this branch is merged.
+Approved on 2026-10-08. Release and handover (D7–D9) start from `main` once this branch is merged.

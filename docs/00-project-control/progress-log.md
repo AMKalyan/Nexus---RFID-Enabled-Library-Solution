@@ -12,7 +12,7 @@ A running record of delivery against the SOP §9 stages. It is updated at every 
 | 4 Core library functions | Day 2 (2026-10-05) AM | 2026-10-07 | `sop-stage-4` |
 | 5 RFID middleware & integrations | Day 2 midday | 2026-10-07 | `sop-stage-5` |
 | 6 Migration & resilience | Day 2 afternoon | 2026-10-07 | `sop-stage-6` |
-| 7 Verification | Day 2 evening | — | `sop-stage-7` |
+| 7 Verification | Day 2 evening | 2026-10-08 | `sop-stage-7` |
 | Release & handover (D9–D10) | Day 2 evening | — | `v1.0.0-eval` |
 
 ## Session log
@@ -63,6 +63,6 @@ A running record of delivery against the SOP §9 stages. It is updated at every 
 - Task 26 on `stage/7-verification`: offline bundle build, verified install, update with automatic rollback, manual rollback, licence activation (read-only until licensed outside development). Releases tagged `v1.0.0` and `v1.0.1` (build notes, reversible migration 0004).
 - AC 09 rehearsed with networking off: install 1.0.0, update to 1.0.1, roll back to 1.0.0, legacy data IDENTICAL (`ops/tests/ac09_offline_lifecycle.md`). The development database was backed up first and restored afterwards.
 - Gate run: 242 backend (92% coverage), 83 acceptance, 6 simulator, 5 migration-tool, 9 frontend tests passing; traceability matrix 253 of 253 passing.
-- Stage 7 gate record written; awaiting approval.
+- Stage 7 gate approved, merged and tagged `sop-stage-7`.
 
-**Next task:** Stage 7 gate approval, then Task 27 (D4 SBOM, D7 deployment, D8 operations, D9 demonstration documents, final release tag) on `release/1.0.0`.
+**Next task:** Task 27 (D4 SBOM, D7 deployment, D8 operations, D9 demonstration documents, final release tag) on `release/1.0.0`.

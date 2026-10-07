@@ -108,6 +108,79 @@
         "title": "AuditPage",
         "type": "object"
       },
+      "BatchOut": {
+        "properties": {
+          "committed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Committed At"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "rows_committed": {
+            "title": "Rows Committed",
+            "type": "integer"
+          },
+          "rows_duplicate": {
+            "title": "Rows Duplicate",
+            "type": "integer"
+          },
+          "rows_rejected": {
+            "title": "Rows Rejected",
+            "type": "integer"
+          },
+          "rows_total": {
+            "title": "Rows Total",
+            "type": "integer"
+          },
+          "rows_valid": {
+            "title": "Rows Valid",
+            "type": "integer"
+          },
+          "source_file": {
+            "title": "Source File",
+            "type": "string"
+          },
+          "source_sha256": {
+            "title": "Source Sha256",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "source_file",
+          "source_sha256",
+          "status",
+          "rows_total",
+          "rows_valid",
+          "rows_rejected",
+          "rows_duplicate",
+          "rows_committed",
+          "created_at",
+          "committed_at"
+        ],
+        "title": "BatchOut",
+        "type": "object"
+      },
       "BibBrief": {
         "properties": {
           "author": {
@@ -464,6 +537,20 @@
         "title": "BibPatch",
         "type": "object"
       },
+      "Body_upload_batch_api_v1_migration_batches_post": {
+        "properties": {
+          "file": {
+            "contentMediaType": "application/octet-stream",
+            "title": "File",
+            "type": "string"
+          }
+        },
+        "required": [
+          "file"
+        ],
+        "title": "Body_upload_batch_api_v1_migration_batches_post",
+        "type": "object"
+      },
       "CardLoginIn": {
         "additionalProperties": false,
         "properties": {
@@ -766,7 +853,7 @@
       },
       "DeviceEventIn": {
         "additionalProperties": false,
-        "description": "Envelope for every device event (interface design \u00a72.2).",
+        "description": "Envelope for every device event (interface design §2.2).",
         "properties": {
           "device_type": {
             "$ref": "#/components/schemas/DeviceType"
@@ -5533,8 +5620,142 @@
       }
     },
     "/api/v1/migration/batches": {
+      "get": {
+        "operationId": "list_batches_api_v1_migration_batches_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/BatchOut"
+                  },
+                  "title": "Response List Batches Api V1 Migration Batches Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "List Batches",
+        "tags": [
+          "migration"
+        ]
+      },
       "post": {
         "operationId": "upload_batch_api_v1_migration_batches_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_upload_batch_api_v1_migration_batches_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Upload Batch",
+        "tags": [
+          "migration"
+        ]
+      }
+    },
+    "/api/v1/migration/batches/{batch_id}/commit": {
+      "post": {
+        "operationId": "commit_batch_api_v1_migration_batches__batch_id__commit_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "batch_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Batch Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Commit Batch Api V1 Migration Batches  Batch Id  Commit Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Commit Batch",
+        "tags": [
+          "migration"
+        ]
+      }
+    },
+    "/api/v1/migration/batches/{batch_id}/report": {
+      "get": {
+        "operationId": "batch_report_api_v1_migration_batches__batch_id__report_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "batch_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Batch Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "format",
+            "required": false,
+            "schema": {
+              "default": "json",
+              "enum": [
+                "json",
+                "csv"
+              ],
+              "title": "Format",
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "content": {
@@ -5543,9 +5764,107 @@
               }
             },
             "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
           }
         },
-        "summary": "Upload Batch",
+        "summary": "Batch Report",
+        "tags": [
+          "migration"
+        ]
+      }
+    },
+    "/api/v1/migration/batches/{batch_id}/rollback": {
+      "post": {
+        "operationId": "rollback_batch_api_v1_migration_batches__batch_id__rollback_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "batch_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Batch Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Rollback Batch Api V1 Migration Batches  Batch Id  Rollback Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Rollback Batch",
+        "tags": [
+          "migration"
+        ]
+      }
+    },
+    "/api/v1/migration/batches/{batch_id}/validate": {
+      "post": {
+        "operationId": "validate_batch_api_v1_migration_batches__batch_id__validate_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "batch_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Batch Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Validate Batch Api V1 Migration Batches  Batch Id  Validate Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Validate Batch",
         "tags": [
           "migration"
         ]

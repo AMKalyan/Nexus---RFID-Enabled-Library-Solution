@@ -1,0 +1,158 @@
+"""Build the test-to-requirement matrix from JUnit results (NFR 05, SOP §9 Stage 7).
+
+    python ops/trace_tests.py backend/reports/junit.xml backend/reports/junit-device-sim.xml \
+        backend/reports/junit-migration.xml > docs/06-testing/test-to-requirement-matrix.md
+
+A test is traced by its name: test_fr02_..., test_nfr05_..., test_ac01_... map to FR 02, NFR 05 and AC 01.
+Requirements and the acceptance scenarios covering them are read from the RTM, so gaps show up.
+"""
+
+from __future__ import annotations
+
+import re
+import sys
+from collections import defaultdict
+from pathlib import Path
+from xml.etree.ElementTree import parse  # nosec B405 - parses our own pytest output, not untrusted input
+
+ROOT = Path(__file__).resolve().parents[1]
+RTM = ROOT / "docs" / "01-requirements" / "rtm.md"
+NAME = re.compile(r"test_(fr|nfr|ac)(\d{2})_")
+ROW = re.compile(r"^\| ((?:FR|NFR|AC) \d{2}) \| ([^|]+) \|")
+REQ_ID = re.compile(r"(?:FR|NFR) \d{2}")
+
+# Requirements verified by inspection or a manual rehearsal rather than (only) by automated tests.
+OTHER_EVIDENCE = {
+    "FR 12": (
+        "Offline install, update and rollback rehearsal (`ops/tests/ac09_offline_lifecycle.md`)",
+        "Rehearsal",
+    ),
+    "NFR 03": ("UAT in a browser on Windows 11; Windows Server notes in the deployment guide", "Release"),
+    "NFR 04": (
+        "Exact pins and lockfiles; pip-audit and npm audit clean (`security-checks.md`); SBOM",
+        "Release",
+    ),
+    "NFR 05": (
+        "This matrix; `performance-results.md`, `security-checks.md`, `uat-checklist.md`",
+        "Inspection",
+    ),
+    "NFR 06": (
+        "Adapter registry, `.env` configuration, JSON logs, Alembic migrations, ops scripts",
+        "Inspection",
+    ),
+    "NFR 07": ("JSON logs with correlation IDs; operations runbook", "Inspection"),
+    "NFR 08": ("Documentation packages D2 and D5; D7 and D8 at release", "Release"),
+    "NFR 09": ("Stage gate records; production backlog", "Release"),
+    "AC 09": (
+        "Offline rehearsal of the 1.0.0 to 1.0.1 update and rollback (`ops/tests/ac09_offline_lifecycle.md`)",
+        "Rehearsal",
+    ),
+}
+
+Case = tuple[str, str, str]  # (suite, test name, outcome)
+
+
+def rtm() -> tuple[dict[str, str], dict[str, list[str]]]:
+    """Requirement summaries, and for each requirement the acceptance scenarios that cover it."""
+    found: dict[str, str] = {}
+    covered_by: dict[str, list[str]] = defaultdict(list)
+    for line in RTM.read_text(encoding="utf-8").splitlines():
+        m = ROW.match(line)
+        if not m or m.group(1) in found:
+            continue
+        found[m.group(1)] = m.group(2).strip()
+        if m.group(1).startswith("AC "):
+            cells = [c.strip() for c in line.strip().strip("|").split("|")]
+            for req in REQ_ID.findall(cells[2]):
+                covered_by[req].append(m.group(1))
+    return found, covered_by
+
+
+def results(paths: list[str]) -> list[Case]:
+    cases = []
+    for path in paths:
+        stem = Path(path).stem  # junit.xml -> backend, junit-device-sim.xml -> device-sim
+        suite = stem.removeprefix("junit-") if stem.startswith("junit-") else "backend"
+        for case in parse(path).getroot().iter("testcase"):  # noqa: S314  # nosec B314 - our own pytest output
+            if case.find("skipped") is not None:
+                outcome = "skipped"
+            elif case.find("failure") is not None or case.find("error") is not None:
+                outcome = "failed"
+            else:
+                outcome = "passed"
+            cases.append((suite, re.sub(r"\[.*\]$", "", case.get("name", "")), outcome))
+    return cases
+
+
+def verdict(req: str, tally, covered_by: dict[str, list[str]]) -> str:  # noqa: ANN001
+    ok, n = tally(req)
+    acs = covered_by.get(req, [])
+    tested = n > 0 or any(tally(ac)[1] > 0 for ac in acs)
+    failing = ok < n or any(tally(ac)[0] < tally(ac)[1] for ac in acs)
+    kind = OTHER_EVIDENCE.get(req, ("", ""))[1]
+    if failing:
+        return "FAIL"
+    if kind == "Release":
+        return "Pass (tests); release evidence pending" if tested else "Pending release"
+    if kind == "Rehearsal":
+        return "Pass (tests and rehearsal)" if tested else "Pass (rehearsal)"
+    return "Pass" if tested else "Inspection"
+
+
+def main() -> None:
+    sys.stdout.reconfigure(encoding="utf-8")  # type: ignore[attr-defined]
+    reqs, covered_by = rtm()
+    cases = results(sys.argv[1:])
+    traced: dict[str, list[Case]] = defaultdict(list)
+    for case in cases:
+        m = NAME.search(case[1])
+        if m:
+            traced[f"{m.group(1).upper()} {m.group(2)}"].append(case)
+    untraced = len(cases) - sum(len(v) for v in traced.values())
+
+    def tally(req: str) -> tuple[int, int]:
+        rows = traced.get(req, [])
+        return sum(1 for *_, o in rows if o == "passed"), len(rows)
+
+    passed = sum(1 for *_, o in cases if o == "passed")
+    out = [
+        "# Test-to-Requirement Matrix",
+        "",
+        "Generated by `ops/trace_tests.py` from the JUnit results of the Stage 7 run of record",
+        "(`bash ops/ci-local.sh`). Parametrised cases are counted individually.",
+        "",
+        f"- Test cases: {len(cases)} ({passed} passed, {len(cases) - passed} not passed)",
+        f"- Traced to a requirement by name: {len(cases) - untraced}",
+        f"- Supporting tests without a requirement prefix (helpers, simulator internals): {untraced}",
+        "",
+        "A test named `test_fr02_...` proves FR 02 directly. A requirement is also proven by the acceptance",
+        "scenarios the RTM maps to it. Other evidence is inspection or a manual rehearsal.",
+        "",
+        "| Requirement | Summary | Tests (pass/total) | Acceptance scenarios | Other evidence | Result |",
+        "|---|---|---|---|---|---|",
+    ]
+    for req, summary in reqs.items():
+        ok, n = tally(req)
+        acs = ", ".join(
+            f"{ac} ({'pass' if 0 < tally(ac)[0] == tally(ac)[1] else 'pending'})"
+            for ac in covered_by.get(req, [])
+        )
+        evidence = OTHER_EVIDENCE.get(req, ("", ""))[0]
+        out.append(
+            f"| {req} | {summary} | {ok}/{n} | {acs} | {evidence} | {verdict(req, tally, covered_by)} |"
+        )
+
+    out += ["", "## Tests by requirement", ""]
+    for req in reqs:
+        rows = traced.get(req, [])
+        if rows:
+            names = sorted({f"`{n}`" + ("" if s == "backend" else f" ({s})") for s, n, _ in rows})
+            out.append(f"- **{req}** ({len(rows)}): {', '.join(names)}")
+    unknown = sorted(set(traced) - set(reqs))
+    if unknown:
+        out += ["", f"Test names referring to IDs not in the RTM: {', '.join(unknown)}"]
+    print("\n".join(out))
+
+
+if __name__ == "__main__":
+    main()

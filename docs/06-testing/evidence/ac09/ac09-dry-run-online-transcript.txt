@@ -1,0 +1,105 @@
+﻿**********************
+Windows PowerShell transcript start
+Start time: 20261008001903
+Username: [redacted]
+RunAs User: [redacted]
+Configuration Name: [redacted]
+Machine: [redacted]
+Host Application: [redacted]
+Process ID: [redacted]
+PSVersion: 5.1.26100.9549
+PSEdition: Desktop
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1.26100.9549
+BuildVersion: 10.0.26100.9549
+CLRVersion: 4.0.30319.42000
+WSManStackVersion: 3.0
+PSRemotingProtocolVersion: 2.3
+SerializationVersion: 1.1.0.1
+**********************
+
+===== 0. Network state (expect no connected adapters and no route to the internet)  [2026-10-08 00:19:03]
+
+Name                               Status       MediaConnectionState
+----                               ------       --------------------
+Bluetooth Network Connection       Disconnected         Disconnected
+Wi-Fi                              Up                      Connected
+vEthernet (WSL (Hyper-V firewall)) Up                      Connected
+internet reachable (pypi.org:443): True
+registry reachable (registry-1.docker.io:443): True
+images present before install:
+
+===== 1. Install 1.0.0 from the bundle (offline)  [2026-10-08 00:19:09]
+bundle verified
+== loading images for 1.0.0
+
+== generating .env with new secrets
+== generating a self-signed TLS certificate (replace with the site's own certificate)
+
+== issuing a 30-day demonstration licence
+
+== starting Nexus 1.0.0
+
+== seeding synthetic demonstration data
+
+demo sign-in details: ops\demo-credentials.txt (keep private)
+version: {"version":"1.0.0","alembic_rev":"0003","licence":"valid"}
+Nexus 1.0.0 is running at https://localhost:8443/
+version: {"version":"1.0.0","alembic_rev":"0003","licence":"valid"}
+counts:  bibs=2000 items=2377 members=300 legacy_catalogue=2000
+accession    rows=2377     sha256=b4a8f24117cd7bf49500939043c6edf5ba2559a78369fc130cdc707c7e14a576
+borrower     rows=300      sha256=581c9777e5eace4c6b1038862b81660cf6d6d02187993b9dfb087387654a4607
+catalogue    rows=2000     sha256=3b69cba43c42df09acf2933703074c76068885fcf04310e6d33d7c81e5e9dd0e
+report: /backups/reports/integrity-20261007T184953Z-after-install-1.0.0.json
+
+===== 2. Update to 1.0.1 from the update bundle (offline)  [2026-10-08 00:19:54]
+== updating 1.0.0 (schema 0003) to 1.0.1
+== backup before update
+== loading images for 1.0.1
+
+== starting 1.0.1
+
+updated to 1.0.1: {"version":"1.0.1","alembic_rev":"0004","licence":"valid","build_notes":"1.0.1: build notes on /version; administrators can publish a maintenance notice."}
+backup taken before the update: nexus-1.0.0-20261007T184957Z-pre-update-1-0-0-1-0-1.dump (rollback: ops\rollback.ps1)
+version: {"version":"1.0.1","alembic_rev":"0004","licence":"valid","build_notes":"1.0.1: build notes on /version; administrators can publish a maintenance notice."}
+counts:  bibs=2000 items=2377 members=300 legacy_catalogue=2000
+state.json: {
+    "previous_version":  "1.0.0",
+    "previous_alembic_rev":  "0003",
+    "current_version":  "1.0.1",
+    "backup":  "nexus-1.0.0-20261007T184957Z-pre-update-1-0-0-1-0-1.dump",
+    "updated_at":  "2026-10-07T18:49:58Z"
+}
+SERVICE   IMAGE                  STATUS
+api       nexus-api:1.0.1        Up 14 seconds (healthy)
+db        postgres:16.4-alpine   Up 58 seconds (healthy)
+web       nexus-web:1.0.1        Up 3 seconds
+
+===== 3. Roll back to 1.0.0  [2026-10-08 00:20:25]
+== rolling back 1.0.1 to 1.0.0 (schema 0003)
+
+
+schema downgraded to 0003
+
+rolled back to 1.0.0: {"version":"1.0.0","alembic_rev":"0003","licence":"valid"}
+version: {"version":"1.0.0","alembic_rev":"0003","licence":"valid"}
+counts:  bibs=2000 items=2377 members=300 legacy_catalogue=2000
+SERVICE   IMAGE                  STATUS
+api       nexus-api:1.0.0        Up 14 seconds (healthy)
+db        postgres:16.4-alpine   Up About a minute (healthy)
+web       nexus-web:1.0.0        Up 3 seconds
+accession    rows=2377     sha256=b4a8f24117cd7bf49500939043c6edf5ba2559a78369fc130cdc707c7e14a576
+borrower     rows=300      sha256=581c9777e5eace4c6b1038862b81660cf6d6d02187993b9dfb087387654a4607
+catalogue    rows=2000     sha256=3b69cba43c42df09acf2933703074c76068885fcf04310e6d33d7c81e5e9dd0e
+report: /backups/reports/integrity-20261007T185049Z-after-rollback-1.0.0.json
+
+===== 4. Legacy integrity: fingerprints after install vs after rollback  [2026-10-08 00:20:49]
+
+compare exit code: 0
+
+===== 5. Network state at the end  [2026-10-08 00:20:50]
+internet reachable (pypi.org:443): True
+AC 09 REHEARSAL COMPLETED
+**********************
+Windows PowerShell transcript end
+End time: 20261008002051
+**********************

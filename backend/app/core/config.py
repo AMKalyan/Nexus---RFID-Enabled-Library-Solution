@@ -1,8 +1,13 @@
 from functools import lru_cache
 from pathlib import Path
 
-from pydantic import SecretStr
+from pydantic import SecretStr, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from sqlalchemy.engine import make_url
+
+DEV_ENVIRONMENTS = {"dev", "test"}
+DEV_PASSWORDS = {"devapp", "devowner"}
+MIN_SECRET_LENGTH = 32
 
 
 def _read_version() -> str:
@@ -13,7 +18,10 @@ def _read_version() -> str:
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=("../.env", ".env"), env_file_encoding="utf-8", extra="ignore")
+    # hide_input_in_errors keeps secrets out of validation messages and therefore out of startup logs.
+    model_config = SettingsConfigDict(
+        env_file=("../.env", ".env"), env_file_encoding="utf-8", extra="ignore", hide_input_in_errors=True
+    )
 
     environment: str = "dev"
     app_version: str = _read_version()
@@ -43,6 +51,31 @@ class Settings(BaseSettings):
     run_worker: bool = True
     licence_file: str = "licence.json"
     licence_key: SecretStr = SecretStr("dev-licence-key")
+
+    @model_validator(mode="after")
+    def _refuse_insecure_secrets(self) -> "Settings":
+        """Outside development, built-in, placeholder or short secrets stop the API from starting (NFR 02)."""
+        if self.environment in DEV_ENVIRONMENTS:
+            return self
+        problems = []
+        for name, secret in (("JWT_SECRET", self.jwt_secret), ("LICENCE_KEY", self.licence_key)):
+            value = secret.get_secret_value()
+            if value.startswith(("dev-", "replace")) or len(value) < MIN_SECRET_LENGTH:
+                problems.append(
+                    f"{name} must be a generated value of at least {MIN_SECRET_LENGTH} characters"
+                )
+        for name, url in (
+            ("DATABASE_URL", self.database_url),
+            ("OWNER_DATABASE_URL", self.owner_database_url),
+        ):
+            password = make_url(url).password or ""
+            if password in DEV_PASSWORDS or password.startswith("replace"):
+                problems.append(f"{name} uses a development or placeholder password")
+        if problems:
+            raise ValueError(
+                f"Insecure configuration for environment '{self.environment}': " + "; ".join(problems)
+            )
+        return self
 
 
 @lru_cache

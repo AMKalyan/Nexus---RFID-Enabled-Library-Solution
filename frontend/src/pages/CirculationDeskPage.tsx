@@ -28,6 +28,8 @@ export function CirculationDeskPage() {
       const exact = found.find((m) => m.card_no === cardNo.trim());
       if (!exact) throw new ApiError("MEMBER_NOT_FOUND", "No member with that card number", 404);
       setMember(await members.get(exact.id));
+      // Looking up the same member again must also refresh their loans (made at a kiosk, by NCIP, ...).
+      void qc.invalidateQueries({ queryKey: ["desk-loans", exact.id] });
     } catch (e) {
       setMember(null);
       setNotice({ tone: "refused", error: e as ApiError });

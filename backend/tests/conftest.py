@@ -10,6 +10,7 @@ from sqlalchemy.engine import make_url
 from sqlalchemy.orm import Session
 
 BACKEND_DIR = Path(__file__).resolve().parents[1]
+LOCK_TIMEOUT = "30s"
 BASE_APP = os.environ.get(
     "TEST_DATABASE_URL", "postgresql+psycopg://nexus_app:devapp@localhost:5433/nexus_test"
 )
@@ -26,6 +27,8 @@ def migrated_db() -> Iterator[None]:
     with admin.connect() as c:
         c.execute(text(f'DROP DATABASE IF EXISTS "{owner.database}" WITH (FORCE)'))
         c.execute(text(f'CREATE DATABASE "{owner.database}"'))
+        # A test blocked on a lock fails within seconds with the lock error instead of hanging (DEF-012).
+        c.execute(text(f"ALTER DATABASE \"{owner.database}\" SET lock_timeout = '{LOCK_TIMEOUT}'"))
     admin.dispose()
     env = {**os.environ, "OWNER_DATABASE_URL": BASE_OWNER, "DATABASE_URL": BASE_APP}
     subprocess.run([sys.executable, "-m", "alembic", "upgrade", "head"], check=True, env=env, cwd=BACKEND_DIR)

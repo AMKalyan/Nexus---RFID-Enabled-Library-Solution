@@ -138,3 +138,32 @@ def test_nfr02_upload_rejects_wrong_columns(client, auth_headers, tmp_path):
 
 def test_nfr02_librarian_cannot_migrate(client, auth_headers, sample_xlsx):
     assert upload(client, auth_headers("Librarian"), sample_xlsx.path).status_code == 403
+
+
+def test_nfr02_upload_size_limit(client, auth_headers, monkeypatch):
+    from app.core.config import get_settings
+
+    monkeypatch.setattr(get_settings(), "upload_max_mb", 1)
+    big = b"Accession No\n" + b"x" * (1024 * 1024 + 1)
+    r = client.post(
+        "/api/v1/migration/batches", headers=auth_headers("Admin"), files={"file": ("big.csv", big)}
+    )
+    assert r.status_code == 413 and r.json()["code"] == "UPLOAD_TOO_LARGE"
+
+
+def test_nfr02_upload_row_cap(client, auth_headers, tmp_path, monkeypatch):
+    from app.services.migration import service
+
+    monkeypatch.setattr(service, "MAX_ROWS", 1)
+    header = (
+        "Accession No,Barcode,Title,Author,ISBN,Publisher,Year,Edition,Subjects,Call No,Shelf,Item Type,"
+        "Price,Acquired On"
+    )
+    row = "ACC-700{n},BC7000000{n},Book {n},Rao,,Pub,2001,,,,A-01,lending,10,"
+    path = tmp_path / "rows.csv"
+    path.write_text("\n".join([header, row.format(n=1), row.format(n=2)]) + "\n", encoding="utf-8")
+    with open(path, "rb") as f:
+        r = client.post(
+            "/api/v1/migration/batches", headers=auth_headers("Admin"), files={"file": ("rows.csv", f)}
+        )
+    assert r.status_code == 422 and r.json()["code"] == "UPLOAD_TOO_MANY_ROWS"

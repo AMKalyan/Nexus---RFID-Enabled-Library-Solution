@@ -12,7 +12,7 @@ A running record of delivery against the SOP §9 stages. It is updated at every 
 | 4 Core library functions | Day 2 (2026-10-05) AM | 2026-10-07 | `sop-stage-4` |
 | 5 RFID middleware & integrations | Day 2 midday | 2026-10-07 | `sop-stage-5` |
 | 6 Migration & resilience | Day 2 afternoon | 2026-10-07 | `sop-stage-6` |
-| 7 Verification | Day 2 evening | — | `sop-stage-7` |
+| 7 Verification | Day 2 evening | 2026-10-08 | `sop-stage-7` |
 | Release & handover (D9–D10) | Day 2 evening | — | `v1.0.0-eval` |
 
 ## Session log
@@ -25,7 +25,7 @@ A running record of delivery against the SOP §9 stages. It is updated at every 
 ## Resume checklist (next session)
 1. `git status` and `git log --oneline --decorate -10`: confirm you're on the expected branch and see the last tag.
 2. Read the "Next task" line below and the matching task in `implementation-plan.md`.
-3. From Stage 3 onwards: `docker compose up -d`, then run the test suite to confirm a green baseline before continuing.
+3. From Stage 3 onwards: `docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d` (the dev override is required with the local dev passwords, DEF-009), then run the test suite to confirm a green baseline before continuing.
 
 - Stage 1 merged and tagged `sop-stage-1`.
 - Stage 2 on `stage/2-design`: use cases, data dictionary, architecture, database, interface and security designs, ADR-0001..0005, design review, implementation plan.
@@ -55,4 +55,14 @@ A running record of delivery against the SOP §9 stages. It is updated at every 
 - Live 20k run reconciled exactly against the generator manifest; batch rollback and restore rehearsed on the stack with legacy data IDENTICAL (`docs/05-data-migration/`). DEF-005 and DEF-006 closed.
 - Stage 6 gate approved, merged and tagged `sop-stage-6`.
 
-**Next task:** Task 25 of `implementation-plan.md` (full verification run and test-to-requirement matrix) on `stage/7-verification`.
+- Stage 7 Task 25 on `stage/7-verification`: API contract regression test; load test at 10 and 50 users; security scanners and live smoke checks; UAT of AC 01-08 and AC 10 with screenshots; generated test-to-requirement matrix; test plan and results. Run of record: 234 backend (92% coverage), 6 simulator, 5 migration-tool, 9 frontend tests passing; 83 acceptance tests passing.
+- Defects DEF-007 to DEF-014 raised. S2 defects DEF-009 (insecure defaults accepted outside development) and DEF-011 (local pipeline hid failures) fixed on `fix/` branches; DEF-008 (50-user latency) recorded as a known limitation; DEF-012 (one unexplained stall) mitigated with a fail-fast lock timeout.
+- The API image now defaults to production mode; local development uses `docker-compose.dev.yml`.
+
+### 2026-10-08 — Session 4
+- Task 26 on `stage/7-verification`: offline bundle build, verified install, update with automatic rollback, manual rollback, licence activation (read-only until licensed outside development). Releases tagged `v1.0.0` and `v1.0.1` (build notes, reversible migration 0004).
+- AC 09 rehearsed with networking off: install 1.0.0, update to 1.0.1, roll back to 1.0.0, legacy data IDENTICAL (`ops/tests/ac09_offline_lifecycle.md`). The development database was backed up first and restored afterwards.
+- Gate run: 242 backend (92% coverage), 83 acceptance, 6 simulator, 5 migration-tool, 9 frontend tests passing; traceability matrix 253 of 253 passing.
+- Stage 7 gate approved, merged and tagged `sop-stage-7`.
+
+**Next task:** Task 27 (D4 SBOM, D7 deployment, D8 operations, D9 demonstration documents, final release tag) on `release/1.0.0`.

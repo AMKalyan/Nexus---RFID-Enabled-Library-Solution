@@ -46,3 +46,6 @@ backend/reports/
 *.tsbuildinfo
 device-sim/.state/
 ops/reports/
+
+# Site licence file (issued per installation)
+licence/

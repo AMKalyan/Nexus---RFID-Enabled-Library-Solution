@@ -1,0 +1,54 @@
+{
+  "target": "https://localhost:8443",
+  "users": 50,
+  "duration_s": 60.7,
+  "host": {
+    "os": "Windows-11-10.0.26200-SP0",
+    "cpu_count": 16,
+    "python": "3.12.6"
+  },
+  "results": {
+    "checkin": {
+      "requests": 876,
+      "errors": 0,
+      "error_rate": 0.0,
+      "p50_ms": 659.3,
+      "p95_ms": 1004.0,
+      "p99_ms": 1385.7,
+      "max_ms": 1753.8
+    },
+    "checkout": {
+      "requests": 876,
+      "errors": 0,
+      "error_rate": 0.0,
+      "p50_ms": 694.8,
+      "p95_ms": 1026.6,
+      "p99_ms": 1153.1,
+      "max_ms": 1819.3
+    },
+    "dashboard": {
+      "requests": 455,
+      "errors": 0,
+      "error_rate": 0.0,
+      "p50_ms": 696.8,
+      "p95_ms": 1034.8,
+      "p99_ms": 1349.2,
+      "max_ms": 2033.7
+    },
+    "opac_search": {
+      "requests": 3072,
+      "errors": 0,
+      "error_rate": 0.0,
+      "p50_ms": 485.9,
+      "p95_ms": 840.5,
+      "p99_ms": 1133.3,
+      "max_ms": 1544.0
+    },
+    "all": {
+      "requests": 5279,
+      "errors": 0,
+      "error_rate": 0.0,
+      "throughput_rps": 87.0
+    }
+  }
+}

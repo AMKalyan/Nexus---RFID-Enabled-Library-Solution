@@ -19,6 +19,27 @@ There is no real hardware in this project. Every device and outside service (RFI
 | Migration | Import a 20,000-row spreadsheet: validate, remove duplicates, commit in one step, reconcile the counts |
 | Operations | Backup and restore, a check that proves the old data is unchanged, offline install, update and rollback |
 
+## Screenshots
+
+<table>
+  <tr>
+    <td width="50%" valign="top"><img src="docs/06-testing/evidence/uat/ac08-dashboard.jpg" alt="Dashboard with live statistics" width="100%"><br><sub>Dashboard with live statistics</sub></td>
+    <td width="50%" valign="top"><img src="docs/06-testing/evidence/uat/ac04-reference-item-refused.jpg" alt="Circulation desk refusing a reference book" width="100%"><br><sub>Circulation desk refusing a reference book</sub></td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top"><img src="docs/06-testing/evidence/uat/ac02-tag-associated.jpg" alt="Tagging a book with an RFID tag" width="100%"><br><sub>Tagging a book with an RFID tag</sub></td>
+    <td width="50%" valign="top"><img src="docs/06-testing/evidence/uat/ac06-gate-alarm-cctv-email.jpg" alt="Security gate alarm with camera snapshot" width="100%"><br><sub>Security gate alarm with camera snapshot</sub></td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top"><img src="docs/06-testing/evidence/uat/ac05-2-inventory-report.jpg" alt="Shelf inventory: found, misplaced and missing books" width="100%"><br><sub>Shelf inventory: found, misplaced and missing books</sub></td>
+    <td width="50%" valign="top"><img src="docs/06-testing/evidence/uat/ac03-3-ncip-and-sip2-loans.jpg" alt="Loans made through NCIP and SIP2 at the desk" width="100%"><br><sub>Loans made through NCIP and SIP2 at the desk</sub></td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top"><img src="docs/06-testing/evidence/uat/ac07-1-waiting-for-card-tap.jpg" alt="Staff sign-in waiting for a smart-card tap" width="100%"><br><sub>Staff sign-in waiting for a smart-card tap</sub></td>
+    <td width="50%" valign="top"><img src="docs/06-testing/evidence/uat/ac01-migration-batches.jpg" alt="Migration batches: 20,000 rows imported" width="100%"><br><sub>Migration batches: 20,000 rows imported</sub></td>
+  </tr>
+</table>
+
 ## Architecture
 
 ```mermaid
@@ -114,7 +135,7 @@ This runs formatting, lint, type and security checks, dependency audits, and all
 | `device-sim/` | RFID device simulator |
 | `migration/` | Spreadsheet import tool and sample data generator |
 | `ops/` | Install, update, rollback, backup, restore and integrity scripts |
-| `docs/` | Requirements, design, testing, deployment, operations and demo documents |
+| `docs/` | Requirements, design, testing, deployment and operations documents |
 
 ## Development workflow
 
@@ -148,5 +169,5 @@ Bugs were fixed on `fix/DEF-NNN-*` branches and are listed in the [defect log](d
 | Tests and results | [`docs/06-testing/`](docs/06-testing/) |
 | Installation and configuration | [`docs/07-deployment/`](docs/07-deployment/) |
 | Administration, user and API guides | [`docs/08-operations/`](docs/08-operations/) |
-| Demo script and known limitations | [`docs/09-demo/`](docs/09-demo/) |
+| Known limitations and production backlog | [`docs/09-limitations-and-backlog/`](docs/09-limitations-and-backlog/) |
 | Release history | [RELEASE-NOTES.md](RELEASE-NOTES.md) |

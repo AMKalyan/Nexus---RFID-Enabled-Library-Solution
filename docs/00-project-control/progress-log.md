@@ -72,4 +72,4 @@ A running record of delivery against the SOP §9 stages. It is updated at every 
 - Run of record: 247 backend (92% coverage), 85 acceptance, 8 simulator, 5 migration-tool, 11 frontend tests passing; traceability 260/260.
 - Release record `stage-gates/release.md`; release merged into `main` and tagged `v1.0.0-eval`.
 
-**Status:** complete. Remaining owner step: link the demo recording in `docs/09-demo/README.md`.
+**Status:** complete.

@@ -6,7 +6,7 @@ Complete this checklist before running the installer ([installation guide](insta
 
 | Check | Requirement | Notes |
 |---|---|---|
-| Operating system | Windows Server 2022 or a Linux VM (any current distribution with Docker Engine) | Nexus has no native Windows service. It runs only as Linux containers. A native service package is in the [production backlog](../09-demo/production-backlog.md) |
+| Operating system | Windows Server 2022 or a Linux VM (any current distribution with Docker Engine) | Nexus has no native Windows service. It runs only as Linux containers. A native service package is in the [production backlog](../09-limitations-and-backlog/production-backlog.md) |
 | Container runtime | Docker that runs **Linux containers**, with the Compose v2 plugin (`docker compose`, not `docker-compose`) | On Windows this means a WSL 2 or Hyper-V Linux backend. Windows containers mode does not work |
 | Docker starts at boot | Docker Desktop set to start when the host signs in, or the Docker Engine service enabled at boot (`systemctl enable docker` on Linux) | The services have `restart: unless-stopped` (since 1.0.2, DEF-018), so they come back after a host or Docker restart, but only once Docker itself is running |
 | Docker access | The installing account can run `docker` without a prompt (local Administrators / `docker-users` on Windows, the `docker` group or root on Linux) | The scripts call `docker load`, `docker run` and `docker compose` |

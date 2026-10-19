@@ -15,7 +15,7 @@
 | D4 Source repository | Branch strategy; SBOM and licence inventory generated from the shipped images | [`docs/04-repository/`](../../04-repository/) | ☑ |
 | D7 Deployment package | Offline bundles with checksums and SBOM; install, update, rollback, backup and restore scripts (PowerShell and shell); environment checklist; installation, configuration, backup/restore and update/rollback guides | `ops/`, [`docs/07-deployment/`](../../07-deployment/) | ☑ |
 | D8 Operational documentation | Administrator, user, API, device-configuration and training guides; troubleshooting runbook; `openapi.json` | [`docs/08-operations/`](../../08-operations/) | ☑ |
-| D9 Demonstration | 15-minute demo script for AC 01–10, presentation outline, known limitations, production backlog. The recording link is added by the owner | [`docs/09-demo/`](../../09-demo/) | ☑ |
+| D9 Demonstration | Known limitations and production backlog. The demo script and presentation outline are kept outside the repository | [`docs/09-limitations-and-backlog/`](../../09-limitations-and-backlog/) | ☑ |
 
 ## Release 1.0.2
 
@@ -58,6 +58,5 @@ Writing the deployment and operations guides meant checking every documented beh
 - **DEF-008:** latency at 50 users with one API process. Known limitation; backlog NX-063.
 - **DEF-012:** one unexplained test stall. Monitoring; the test database fails fast on lock waits; backlog NX-064.
 - **NFR 03 is partial:** Windows Server 2022 was not rehearsed.
-- **The demo recording** is to be linked in `docs/09-demo/README.md`.
 
-Everything else open is listed in [known limitations](../../09-demo/known-limitations.md) and the [production backlog](../../09-demo/production-backlog.md).
+Everything else open is listed in [known limitations](../../09-limitations-and-backlog/known-limitations.md) and the [production backlog](../../09-limitations-and-backlog/production-backlog.md).

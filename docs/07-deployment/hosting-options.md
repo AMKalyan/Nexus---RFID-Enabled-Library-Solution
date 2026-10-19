@@ -112,4 +112,4 @@ There is no RFID hardware on a hosted demo. Tag reads, handheld sweeps, gate pas
 SIM_API=https://nexus-demo.example.org/api/v1 python device-sim/sim.py gate --epc <EPC>
 ```
 
-The operator can run it against the public URL during a presentation. Otherwise, those flows are shown in the [UAT screenshots](../06-testing/uat-checklist.md) and the [demo script](../09-demo/demo-script.md).
+The operator can run it against the public URL during a presentation. Otherwise, those flows are shown in the [UAT screenshots](../06-testing/uat-checklist.md).

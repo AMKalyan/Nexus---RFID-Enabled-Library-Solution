@@ -113,7 +113,7 @@ The API reads `licence/licence.json` (mounted read-only at `/app/licence/licence
 - Outside development, an installation without a valid licence is **read-only** for everyone except administrators. Write requests from other roles get `403` with code `LICENCE_REQUIRED`. Sign-in is always allowed.
 - A licence is `{site, expires, features, sig}`, where `sig` is HMAC-SHA256 over the other fields. It is valid only if it was signed with the installation's `LICENCE_KEY` (in `.env`).
 - On a first install, the installer generates a new random `LICENCE_KEY`. A licence file issued before installation is valid only if it was signed with the key that ends up in `.env`. Since 1.0.2 (DEF-020), pass the issued key with the licence: `-Licence FILE -LicenceKeyFile KEY_FILE` / `--licence FILE --licence-key-file KEY_FILE`. The installer writes the key to `LICENCE_KEY` in `.env` (replacing the generated one) before it starts the stack. Keep the key file as protected as `.env`.
-- HMAC means the site holds the verification key, so it could also issue licences. This is a prototype choice. Asymmetric (PKI) licence signing is in the [production backlog](../09-demo/production-backlog.md).
+- HMAC means the site holds the verification key, so it could also issue licences. This is a prototype choice. Asymmetric (PKI) licence signing is in the [production backlog](../09-limitations-and-backlog/production-backlog.md).
 
 To install or replace a licence on a running installation:
 
@@ -158,5 +158,5 @@ Bundle verification checks the files listed in `SHA256SUMS`. After an update the
 
 ## 9. Not provided
 
-- No Windows service or `systemd` unit. Since 1.0.2 (DEF-018) the compose file sets `restart: unless-stopped` on `db`, `api` and `web`, so the containers come back after a host or Docker restart, provided Docker itself starts at boot (configure that on the host). Containers stopped by hand with `docker compose stop` stay stopped. A native service package is in the [production backlog](../09-demo/production-backlog.md).
+- No Windows service or `systemd` unit. Since 1.0.2 (DEF-018) the compose file sets `restart: unless-stopped` on `db`, `api` and `web`, so the containers come back after a host or Docker restart, provided Docker itself starts at boot (configure that on the host). Containers stopped by hand with `docker compose stop` stay stopped. A native service package is in the [production backlog](../09-limitations-and-backlog/production-backlog.md).
 - No uninstaller. `docker compose down` stops and removes the containers and keeps the volumes. `docker compose down -v` also deletes the database **and the backup volume**.

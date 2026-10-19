@@ -42,7 +42,7 @@ Module and test columns are filled in from Stage 2 (design) and Stage 7 (verific
 | NFR 06 | Maintainability | Modular adapters, external config, structured logs, versioned migrations, documented builds, rollback | Adapter interfaces, `.env` config, JSON logs, Alembic, build docs, rollback scripts | Architecture package, ops scripts; **Stage 3:** adapter registry, `.env` configuration, JSON logs, Alembic 0001–0002 with downgrade, `test_adr0003_no_raw_sql_in_application_code`; **Release:** adapter switching in `docs/07-deployment/configuration-guide.md`, reversible migrations (`test_migrations.py`), documented builds and rollback | Done |
 | NFR 07 | Supportability | Diagnostics, health checks, structured logs, runbooks | `/health`, `/version`, device heartbeat, JSON logs with correlation IDs, runbook | `docs/08-operations/troubleshooting-runbook.md`; **Stage 3:** `/api/v1/health` (database check), `/api/v1/version` (migration revision), `test_nfr07_*`; **Release:** `/health` 503 when degraded (DEF-016), restart policy (DEF-018), `docs/08-operations/troubleshooting-runbook.md` | Done |
 | NFR 08 | Documentation | Architecture, device config, IP/interface details, API docs, versions, install, admin, user, troubleshooting | Documentation packages D2, D7, D8 | `docs/`; **Release:** D2, D5, D7 (`docs/07-deployment/`), D8 (`docs/08-operations/`, `openapi.json`) | Done |
-| NFR 09 | Delivery | Complete D0–D10; identify all remaining production work | SOP stage gates, production-completion backlog | `docs/09-demo/production-backlog.md`; **Release:** stage gates 1–7 and the release record, `docs/09-demo/production-backlog.md` | Done (demo recording link to be added in `docs/09-demo/README.md`) |
+| NFR 09 | Delivery | Complete D0–D10; identify all remaining production work | SOP stage gates, production-completion backlog | `docs/09-limitations-and-backlog/production-backlog.md`; **Release:** stage gates 1–7 and the release record, `docs/09-limitations-and-backlog/production-backlog.md` | Done |
 
 ## 3. Priority acceptance scenarios
 
@@ -71,7 +71,7 @@ Module and test columns are filled in from Stage 2 (design) and Stage 7 (verific
 | D6 | Test package | `backend/tests/`, `docs/06-testing/` | 3–7 | Done |
 | D7 | Deployment package | `ops/`, `docs/07-deployment/` | Release | Done |
 | D8 | Operational documentation | `docs/08-operations/` | Release | Done |
-| D9 | Demonstration | `docs/09-demo/` | Release | Done (recording link to be added) |
+| D9 | Demonstration | `docs/09-limitations-and-backlog/` (demo script kept outside the repository) | Release | Done |
 
 ## 5. Change history
 

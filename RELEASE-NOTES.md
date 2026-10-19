@@ -52,4 +52,4 @@ First release of the Nexus RFID library solution prototype. All acceptance scena
 
 Schema revision: `0003`.
 
-Known limitations: see [`docs/09-demo/known-limitations.md`](docs/09-demo/known-limitations.md). These include DEF-008 (latency at 50 concurrent users with one API process) and HMAC-based licences (the site holds the verification key).
+Known limitations: see [`docs/09-limitations-and-backlog/known-limitations.md`](docs/09-limitations-and-backlog/known-limitations.md). These include DEF-008 (latency at 50 concurrent users with one API process) and HMAC-based licences (the site holds the verification key).

@@ -141,7 +141,7 @@ Each external service is reached through an adapter chosen by an `ADAPTER_*` key
 
 - To switch, set the key in `.env` and run `docker compose up -d`.
 - The value is looked up when the adapter is used, not at start-up. An unknown value does not stop the API; the operation that needs the adapter fails with `500` and code `ERR_CONFIG`. Check the value after any change.
-- A vendor adapter is added in code by registering a new value for its kind (`register(kind, name, factory)`) in a new release. Real vendor adapters (SMTP, SMS gateway, CCTV/VMS, RFID SDKs) are in the [production backlog](../09-demo/production-backlog.md). The adapter contracts are in the [interface design](../02-design/interface-design.md).
+- A vendor adapter is added in code by registering a new value for its kind (`register(kind, name, factory)`) in a new release. Real vendor adapters (SMTP, SMS gateway, CCTV/VMS, RFID SDKs) are in the [production backlog](../09-limitations-and-backlog/production-backlog.md). The adapter contracts are in the [interface design](../02-design/interface-design.md).
 - Mock notifications are written to the outbox volume (`/app/outbox` in the API container).
 
 ## 8. Licence file

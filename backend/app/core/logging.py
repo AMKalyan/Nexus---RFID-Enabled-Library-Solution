@@ -16,6 +16,11 @@ def mask_pii(text: str) -> str:
     return _PHONE.sub(lambda m: "***" + m.group(1), text)
 
 
+def initials(name: str) -> str:
+    """'Lila Thakur' -> 'L. T.': enough for a self-service greeting, without disclosing the name."""
+    return " ".join(f"{part[0]}." for part in name.split() if part)
+
+
 def mask_mapping(data: dict[str, Any]) -> dict[str, Any]:
     """Mask values whose key is known to hold personal data."""
     return {k: ("***" if k in PII_KEYS and v else v) for k, v in data.items()}

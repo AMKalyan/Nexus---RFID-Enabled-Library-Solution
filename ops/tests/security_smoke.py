@@ -12,7 +12,7 @@ import argparse
 import re
 import sys
 import uuid
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import httpx
@@ -154,11 +154,29 @@ def main() -> None:
         plain.status_code in (301, 308) and landed == 200,
     )
 
+    # Every attempt claims a different client address: the limit must hold anyway (DEF-015).
+    started = datetime.now(UTC) - timedelta(seconds=5)
     codes = [
-        web.post(f"{api}/auth/login", json={"username": "nobody", "password": "x"}).status_code
-        for _ in range(12)
+        web.post(
+            f"{api}/auth/login",
+            json={"username": "nobody", "password": "x"},
+            headers={"X-Forwarded-For": f"203.0.113.{n}"},
+        ).status_code
+        for n in range(1, 13)
     ]
-    check("Sign-in rate limit (10/minute) → 429", " ".join(map(str, codes)), 429 in codes)
+    check(
+        "Sign-in rate limit (10/minute) → 429, even with a spoofed X-Forwarded-For",
+        " ".join(map(str, codes)),
+        429 in codes,
+    )
+    entries = web.get(f"{api}/admin/audit", params={"action": "auth.login", "size": 20}, headers=admin).json()
+    recent = [e for e in entries["items"] if datetime.fromisoformat(e["occurred_at"]) >= started]
+    spoofed = sorted({e.get("ip") for e in recent if str(e.get("ip", "")).startswith("203.0.113.")})
+    check(
+        "Audit log records the real client address, not a spoofed one",
+        f"{len(recent)} entries from this run; recorded IPs {sorted({str(e.get('ip')) for e in recent})}",
+        bool(recent) and not spoofed,
+    )
 
     sys.stdout.reconfigure(encoding="utf-8")  # type: ignore[attr-defined]
     print("| Check | Observed | Result |\n|---|---|---|")

@@ -1,12 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
-import { api } from "../api/client";
+import { api, getHealth } from "../api/client";
 import { Card, PageHeader, StatusBadge } from "../components/ui";
 
-type Health = { status: string; checks: Record<string, boolean> };
 type Version = { version: string; alembic_rev: string | null; licence: string };
 
 export function HealthPage() {
-  const health = useQuery({ queryKey: ["health"], queryFn: () => api<Health>("/health"), refetchInterval: 15_000 });
+  const health = useQuery({ queryKey: ["health"], queryFn: getHealth, refetchInterval: 15_000 });
   const version = useQuery({ queryKey: ["version"], queryFn: () => api<Version>("/version") });
 
   return (

@@ -27,3 +27,21 @@ describe("api client", () => {
     await expect(api("/y")).rejects.toMatchObject({ code: "MEMBER_BLOCKED", status: 409 } as Partial<ApiError>);
   });
 });
+
+describe("health", () => {
+  it("returns the degraded report that comes with a 503 (DEF-024)", async () => {
+    const { getHealth } = await import("./client");
+    const body = { status: "degraded", checks: { database: false } };
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(new Response(JSON.stringify(body), { status: 503, headers: { "content-type": "application/json" } })),
+    );
+    expect(await getHealth()).toEqual(body);
+  });
+
+  it("still throws for answers that are not a health report", async () => {
+    const { getHealth } = await import("./client");
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response("bad gateway", { status: 502 })));
+    await expect(getHealth()).rejects.toMatchObject({ status: 502 } as Partial<ApiError>);
+  });
+});

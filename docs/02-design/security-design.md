@@ -79,5 +79,5 @@ Trust boundaries:
 ## 7. Supply chain
 
 - Dependencies are pinned. `pip-audit` and `npm audit` run in the build pipeline, and `bandit` covers Python static analysis.
-- Container base images are pinned by digest, and the offline bundle carries SHA-256 checksums of every artefact.
+- Container base images are pinned by exact tag (for example `python:3.12.7-slim`, `postgres:16.4-alpine`), and the offline bundle carries SHA-256 checksums of every artefact. Pinning by digest is in the production backlog.
 - Offline activation uses an HMAC-signed licence file. Its key is distributed out-of-band (A-12).

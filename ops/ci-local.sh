@@ -21,6 +21,11 @@ status=0
 cat "$REPORTS/pytest.txt"
 [ "$status" -eq 0 ] || { echo "== backend tests failed (exit $status)"; exit "$status"; }
 
+echo "== simulator, migration and ops tools: format and lint"
+cd "$ROOT"
+"$PY" -m ruff format --check --config backend/pyproject.toml device-sim migration ops/*.py ops/tests/*.py
+"$PY" -m ruff check --config backend/pyproject.toml device-sim migration ops/*.py ops/tests/*.py
+
 echo "== device simulator: tests"
 cd "$ROOT/device-sim"
 "$PY" -m pytest -q -p no:cacheprovider test_sim.py

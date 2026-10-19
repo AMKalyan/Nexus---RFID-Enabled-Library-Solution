@@ -31,8 +31,21 @@ def test_offline_queue_survives_restart(tmp_path):
 
 
 def test_build_event_shape():
-    ev = build_event("gate", "GatePassage", ["E2801160600002000000AAAA"], direction="out", security_bit=True)
-    assert set(ev) == {"event_id", "device_type", "type", "occurred_at", "epcs", "payload"}
+    ev = build_event(
+        "gate",
+        "GatePassage",
+        ["E2801160600002000000AAAA"],
+        direction="out",
+        security_bit=True,
+    )
+    assert set(ev) == {
+        "event_id",
+        "device_type",
+        "type",
+        "occurred_at",
+        "epcs",
+        "payload",
+    }
     assert ev["payload"] == {"direction": "out", "security_bit": True}
 
 
@@ -46,7 +59,6 @@ def test_load_device_keys_from_credentials_file(tmp_path):
 
 def test_gate_event_queued_during_outage_is_marked_offline(tmp_path, monkeypatch):
     import httpx
-
     import sim
 
     monkeypatch.setattr(sim, "STATE_DIR", tmp_path)
@@ -60,3 +72,36 @@ def test_gate_event_queued_during_outage_is_marked_offline(tmp_path, monkeypatch
     assert "queued" in s.gate("GATE-01", "E2801160600002000000AAAA")
     queued = json.loads((tmp_path / "queue.jsonl").read_text())
     assert queued["device"] == "GATE-01" and queued["event"]["payload"]["offline_decision"] is True
+
+
+def test_replay_keeps_events_refused_for_a_retryable_reason(tmp_path, monkeypatch):
+    """Throttled, unauthorised or failed replays stay queued, in order (DEF-022)."""
+    import httpx
+    import sim
+
+    monkeypatch.setattr(sim, "STATE_DIR", tmp_path)
+    monkeypatch.setenv("SIM_DEVICE_KEYS", '{"GATE-01": "k"}')
+    replies = iter([202, 429, 202])
+    s = sim.Simulator()
+    s.http = httpx.Client(transport=httpx.MockTransport(lambda request: httpx.Response(next(replies))))
+    for n in range(3):
+        s.queue.append(
+            {
+                "device": "GATE-01",
+                "event": build_event("gate", "Heartbeat", event_id=str(n)),
+            }
+        )
+    assert s.queue.flush(s._deliver_queued) == 1  # the 429 stops the replay and keeps its place
+    assert [e["event"]["payload"]["event_id"] for e in s.queue._read()] == ["1", "2"]
+
+
+def test_replay_drops_events_nexus_rejects_as_invalid(tmp_path, monkeypatch):
+    import httpx
+    import sim
+
+    monkeypatch.setattr(sim, "STATE_DIR", tmp_path)
+    monkeypatch.setenv("SIM_DEVICE_KEYS", '{"GATE-01": "k"}')
+    s = sim.Simulator()
+    s.http = httpx.Client(transport=httpx.MockTransport(lambda request: httpx.Response(422)))
+    s.queue.append({"device": "GATE-01", "event": build_event("gate", "Heartbeat")})
+    assert s.queue.flush(s._deliver_queued) == 1 and s.queue.size() == 0  # will never succeed: not retried

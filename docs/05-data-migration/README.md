@@ -33,7 +33,8 @@ This package covers the database structure, schema migrations, the synthetic sam
 ```
 <base> -> 0001, baseline
 0001 -> 0002, Roles, permissions and circulation policies
-0002 -> 0003 (head), agency
+0002 -> 0003, agency
+0003 -> 0004 (head), release 1.0.1: maintenance notice setting and release record
 ```
 
 `alembic upgrade head` runs when the API container starts. The full list is available with `docker compose exec api alembic history`.
@@ -74,7 +75,7 @@ python migration/profile_sheet.py migration/samples/library-export-20k.xlsx
    - Insert all valid rows in one transaction, tagged with the batch id.
    - Fingerprint the legacy tables again.
 
-   If any legacy table changed, or the counts don't balance, the transaction is rolled back. The result is audited as `migration.commit`.
+   Before anything is touched, the commit is refused with `BATCH_NOT_BALANCED` unless the counts reconcile and the staged valid rows match the report (DEF-021). If any legacy table changed during the insert, the transaction is rolled back. The result is audited as `migration.commit`.
 5. **Roll back a batch** if needed. This deletes only the items and bibs carrying that batch id and is audited as `migration.rollback`.
 
 ```bash

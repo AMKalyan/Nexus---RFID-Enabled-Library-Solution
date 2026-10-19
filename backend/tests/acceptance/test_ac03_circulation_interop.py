@@ -120,3 +120,12 @@ def test_fr03_sip2_bad_checksum_asks_for_resend(db_session):
 
 def test_fr03_sip2_unknown_message_asks_for_resend(db_session):
     assert Sip2Adapter(db_session).handle("ZZgarbage") == "96"
+
+
+def test_nfr02_sip2_patron_status_does_not_disclose_the_full_name(db_session, sample_member):
+    """A kiosk only needs a greeting: SIP2 carries initials, never the member's full name (DEF-023)."""
+    response = Sip2Adapter(db_session).handle(f"23001{TS}AOMAIN|AA{sample_member.card_no}|AC|AD|")
+    _, _, fields = Sip2Codec.parse(response)
+    parts = sample_member.full_name.split()
+    assert fields["AE"] == " ".join(f"{p[0]}." for p in parts)
+    assert all(len(p) < 3 or p not in response for p in parts)

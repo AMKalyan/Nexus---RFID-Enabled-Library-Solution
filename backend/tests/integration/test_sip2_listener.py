@@ -41,3 +41,8 @@ async def test_fr03_sip2_listener_refuses_hosts_not_allowed():
 
 async def test_fr03_sip2_listener_drops_oversized_message():
     assert await exchange({"127.0.0.1"}, b"9" * (sip2_server.MAX_MESSAGE + 10) + b"\r") == b""
+
+
+async def test_fr03_sip2_listener_with_empty_allow_list_refuses_everyone():
+    """SIP2 has no transport security: an unconfigured allow-list must not mean 'allow all' (DEF-017)."""
+    assert await exchange(set(), STATUS.encode() + b"\r") == b""

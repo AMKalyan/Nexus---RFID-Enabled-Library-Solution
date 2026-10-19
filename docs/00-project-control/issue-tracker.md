@@ -39,4 +39,5 @@ Status values: Open, In progress, Done, Deferred.
 | NX-062 | Offline bundle, install, update, rollback and licence activation (AC 09) | stage-7, FR-12 | Stage 7 | Done | Stage 7 merge |
 | NX-063 | Scale the API beyond one process (DEF-008) | backlog, NFR-05 | Backlog | Open | |
 | NX-064 | Identify the cause of the intermittent test stall (DEF-012) | backlog, defect | Backlog | Open | |
-| NX-070 | Release, deployment package, operational docs, demonstration | release, FR-12 | Release | Open | |
+| NX-070 | Release, deployment package, operational docs, demonstration | release, FR-12 | Release | Done | Release merge (`v1.0.0-eval`) |
+| NX-071 | Release-stage defects DEF-015 to DEF-024 (found while writing the release documentation) | release, defect, NFR-02, NFR-07 | Release | Done | Release 1.0.2 |

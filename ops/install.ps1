@@ -1,8 +1,9 @@
 # Offline installation from an unzipped bundle (FR 12, AC 09). Run from the folder the bundle was unzipped into:
-#   powershell -ExecutionPolicy Bypass -File ops\install.ps1 [-VerifyOnly] [-Demo] [-Licence FILE]
+#   powershell -ExecutionPolicy Bypass -File ops\install.ps1 [-VerifyOnly] [-Demo] [-Licence FILE -LicenceKeyFile KEY_FILE]
 # -VerifyOnly  check SHA256SUMS and stop      -Demo  seed synthetic data and issue a 30-day demo licence
 # No network access is needed: images come from images.tar.gz and secrets are generated locally.
-param([switch]$VerifyOnly, [switch]$Demo, [string]$Licence = "")
+# -Licence FILE -LicenceKeyFile KEY_FILE  install the site licence and the key it was signed with
+param([switch]$VerifyOnly, [switch]$Demo, [string]$Licence = "", [string]$LicenceKeyFile = "")
 . (Join-Path $PSScriptRoot "common.ps1")
 
 if (-not (Test-Bundle $Root)) { Write-Host "Bundle verification FAILED: do not install this copy."; exit 1 }
@@ -24,6 +25,9 @@ if (-not (Test-Path $envFile)) {
     [IO.File]::WriteAllText($envFile, $text, $Utf8NoBom)
 }
 Set-EnvValue "NEXUS_VERSION" $V
+# The site licence must verify against the key it was issued with (DEF-020).
+if ($LicenceKeyFile) { Set-EnvValue "LICENCE_KEY" ([IO.File]::ReadAllText((Resolve-Path $LicenceKeyFile)).Trim()) }
+$licenceChanged = $false
 
 $certs = Join-Path $Root "ops\nginx\certs"
 $licenceDir = Join-Path $Root "licence"
@@ -37,16 +41,20 @@ if (-not (Test-Path (Join-Path $certs "nexus.crt"))) {
 
 if ($Licence) {
     Copy-Item $Licence (Join-Path $licenceDir "licence.json") -Force
+    $licenceChanged = $true
 } elseif ($Demo -and -not (Test-Path (Join-Path $licenceDir "licence.json"))) {
     Write-Host "== issuing a 30-day demonstration licence"
     $expires = (Get-Date).AddDays(30).ToString("yyyy-MM-dd")
     $key = Get-EnvValue "LICENCE_KEY"
     Invoke-Native { docker run --rm --user 0 -e "LICENCE_KEY=$key" -v "${licenceDir}:/out" --entrypoint python "nexus-api:$V" `
         /app/ops/licence.py issue --site "Demonstration site" --expires $expires --out /out/licence.json } "licence"
+    $licenceChanged = $true
 }
 
 Write-Host "== starting Nexus $V"
 Invoke-Compose up -d --no-build
+# The licence is read when the API starts: restart it so a newly installed licence takes effect.
+if ($licenceChanged) { Invoke-Compose restart api }
 if (-not (Wait-Healthy 180)) { exit 1 }
 
 if ($Demo) {

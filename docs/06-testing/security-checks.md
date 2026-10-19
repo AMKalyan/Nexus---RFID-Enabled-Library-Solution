@@ -5,7 +5,7 @@ Stage 7 security verification (NFR 02, SOP §9 Stage 7). It has three parts:
 - a smoke run against the live stack
 - a manual review against the threat table in [security design §2](../02-design/security-design.md#2-threats-and-controls-stride-summary)
 
-Run on 2026-10-07 against the development stack (`https://localhost:8443`).
+First run on 2026-10-07 against the development stack (`https://localhost:8443`). Re-run for release 1.0.2 on 2026-10-19: 19 of 19 checks pass against a fresh 1.0.2 installation ([rehearsal transcript](evidence/ac09/release-1.0.2-update-transcript.txt)).
 
 ## 1. Scanners
 
@@ -41,7 +41,8 @@ Run on 2026-10-07 against the development stack (`https://localhost:8443`).
 | Device event with a wrong device key → 401 | `401 ERR_DEVICE_AUTH` | Pass |
 | TLS security headers (HSTS, CSP, nosniff, frame denial) | all present | Pass |
 | Plain HTTP redirects to the published HTTPS address | `301 → https://localhost:8443/opac → 200` | Pass (after DEF-010) |
-| Sign-in rate limit (10/minute) → 429 | `401 ×6` then `429 ×6` (earlier sign-ins in the same minute count) | Pass |
+| Sign-in rate limit (10/minute) → 429, even when every attempt claims a different `X-Forwarded-For` | `401 ×6` then `429 ×6` (earlier sign-ins in the same minute count) | Pass (after DEF-015; before it, 12 × `401`) |
+| Audit log records the real client address, not a spoofed one | 10 entries from the run, all with the nginx peer address | Pass (after DEF-015) |
 
 "No internal detail" means the response body has only `error`, `code` and, for validation errors, `fields` (location and message per field). It must not match `Traceback|sqlalchemy|psycopg|/app/|File "|SELECT |INSERT `, and must not be a 500.
 
@@ -73,5 +74,9 @@ Run on 2026-10-07 against the development stack (`https://localhost:8443`).
 |---|---|---|
 | DEF-009: built-in or placeholder secrets accepted outside development, and the settings error echoed a secret fragment | S2 | Closed, retested |
 | DEF-010: HTTP redirect dropped the published HTTPS port | S3 | Closed, retested |
+| DEF-015: a client-supplied `X-Forwarded-For` bypassed the sign-in rate limit and falsified audit IPs (found while writing the release documentation) | S2 | Closed in 1.0.2, retested live |
+| DEF-016: `/health` answered 200 when degraded, hiding a database failure from health checks and the update roll-back | S2 | Closed in 1.0.2, retested live |
+| DEF-017: an empty SIP2 allow-list accepted every address | S2 | Closed in 1.0.2 |
+| DEF-023: SIP2 Patron Status disclosed the member's full name | S3 | Closed in 1.0.2 |
 | Observation: device ingest validates the event body before checking the device key, so an unauthenticated caller with a malformed body gets 422 rather than 401 | Not a defect | The envelope schema is already public in the OpenAPI document, nothing is processed or stored, and the ingest rate limit applies. Recorded for the production backlog (authenticate first) |
 | Observation: fixed development passwords appear in `config.py` defaults, `conftest.py` and the CI workflow | Not a defect | They belong to throwaway local and CI databases, and production refuses them (DEF-009) |

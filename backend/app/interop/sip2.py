@@ -10,6 +10,7 @@ from datetime import UTC, datetime
 from sqlalchemy.orm import Session
 
 from app.core.errors import AppError
+from app.core.logging import initials
 from app.db.models import LoanChannel, MemberStatus
 from app.services.circulation import CirculationRefused, CirculationService, keep_refusal_audit
 from app.services.common import Actor
@@ -119,7 +120,7 @@ class Sip2Adapter:
             {
                 "AO": INSTITUTION,
                 "AA": card,
-                "AE": member.full_name,
+                "AE": initials(member.full_name),  # never the full name over SIP2 (DEF-023)
                 "BL": "Y",
                 "BV": f"{fines:.2f}",
             },

@@ -13,7 +13,7 @@ A running record of delivery against the SOP §9 stages. It is updated at every 
 | 5 RFID middleware & integrations | Day 2 midday | 2026-10-07 | `sop-stage-5` |
 | 6 Migration & resilience | Day 2 afternoon | 2026-10-07 | `sop-stage-6` |
 | 7 Verification | Day 2 evening | 2026-10-08 | `sop-stage-7` |
-| Release & handover (D9–D10) | Day 2 evening | — | `v1.0.0-eval` |
+| Release & handover (D9–D10) | Day 2 evening | 2026-10-19 | `v1.0.0-eval` |
 
 ## Session log
 
@@ -65,4 +65,11 @@ A running record of delivery against the SOP §9 stages. It is updated at every 
 - Gate run: 242 backend (92% coverage), 83 acceptance, 6 simulator, 5 migration-tool, 9 frontend tests passing; traceability matrix 253 of 253 passing.
 - Stage 7 gate approved, merged and tagged `sop-stage-7`.
 
-**Next task:** Task 27 (D4 SBOM, D7 deployment, D8 operations, D9 demonstration documents, final release tag) on `release/1.0.0`.
+### 2026-10-19 — Session 5
+- Release work on `release/1.0.0`: SBOM from the shipped images; D7 deployment, D8 operations and D9 demonstration packages.
+- Writing the release documentation against the code found DEF-015 to DEF-024 (three S2: spoofed client address, `/health` status code, SIP2 allow-list). All fixed test-first on `fix/` branches and released as 1.0.2 (`v1.0.2`).
+- 1.0.2 rehearsed: update from 1.0.1 and rollback (legacy data IDENTICAL), fresh install with a pre-issued licence, 19/19 security smoke checks, `/health` 503 with the database stopped.
+- Run of record: 247 backend (92% coverage), 85 acceptance, 8 simulator, 5 migration-tool, 11 frontend tests passing; traceability 260/260.
+- Release record `stage-gates/release.md`; release merged into `main` and tagged `v1.0.0-eval`.
+
+**Status:** complete. Remaining owner step: link the demo recording in `docs/09-demo/README.md`.

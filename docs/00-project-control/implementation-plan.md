@@ -2897,6 +2897,8 @@ It reports p50/p95/p99 and the error rate. Run it against the full stack (`https
 
 ### Task 26: Offline bundle, install, update and rollback (AC 09)
 
+> As built: release 1.0.1 shipped migration `0004` (head was `0003`) and added a new `maintenance_notice` setting rather than seeding `ui_banner`, which already existed in 1.0.0. See the Stage 7 gate record.
+
 **Files:**
 - Create: `ops/build_bundle.sh`, `ops/build_bundle.ps1`, `ops/install.sh`, `ops/install.ps1`, `ops/update.sh`, `ops/update.ps1`, `ops/rollback.sh`, `ops/rollback.ps1`, `ops/licence.py`, `ops/tests/test_bundle_scripts.sh`
 - Modify: `backend/app/main.py` (licence check sets `app.state.licence_status` to `valid|missing|invalid`; a missing or invalid licence puts the app in read-only mode for non-admins, which shows the activation path)

@@ -176,12 +176,12 @@ flowchart LR
 
 | Container | Image | Ports | Notes |
 |---|---|---|---|
-| `nginx` | `nexus-web:<version>` (nginx + built UI) | 443 (host), 80 → 443 redirect | Self-signed certificate generated at install |
+| `web` | `nexus-web:<version>` (nginx + built UI) | `HTTPS_PORT` (8443 by default) → 443, `HTTP_PORT` (8080) → 80 redirect | Self-signed certificate generated at install; overwrites `X-Forwarded-For` (DEF-015) |
 | `api` | `nexus-api:<version>` | 8000 (internal) | Runs Alembic on start, API and outbox worker |
-| `db` | `postgres:16` (pinned digest) | 5432 (internal only) | Volume `pgdata`; backups to volume `backups` |
-| `device-sim` | `nexus-devsim:<version>` | 8100 (demo only) | Optional profile `demo`; never in production |
+| `db` | `postgres:16.4-alpine` (pinned tag) | 5432 (internal only) | Volume `pgdata`; backups to volume `backups` |
+| `devsim` | `nexus-devsim:<version>` | 8100 (demo only) | Optional profile `demo`; never in production |
 
-Offline lifecycle: see ADR-0002 and the deployment guide (D7).
+All three production services use `restart: unless-stopped`. Offline lifecycle: see ADR-0002 and the [deployment package](../07-deployment/README.md) (D7).
 
 ## 6. Technology choices
 

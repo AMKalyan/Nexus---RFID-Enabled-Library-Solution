@@ -181,3 +181,18 @@ Notification flow: services write to `notification_outbox`; the worker polls eve
 | `PRN-01` | printer | Circulation desk | 10.10.20.51 | Patron cards, spine labels |
 
 Nexus server: 10.10.20.5, TCP 443 (HTTPS), with TCP 6001 (SIP2) optional.
+
+## As built (release 1.0.2)
+
+This document is the design-time contract. Where the implementation differs, the implementation and the [API guide](../08-operations/api-guide.md) are authoritative:
+
+| Design | As built |
+|---|---|
+| Role refusal code `ROLE_NOT_PERMITTED` | Permission failures return `ERR_FORBIDDEN` (403); `ROLE_NOT_PERMITTED` is not used |
+| `PATCH /devices` | Devices are registered (`POST /devices`) and their keys rotated; there is no update endpoint |
+| `/admin/roles` read and write | `GET /admin/roles` only; roles change through `PATCH /admin/users/{id}` |
+| Card login waits on `/ws/live` | It waits on its own socket, `/ws/card` |
+| Device commands ReadTags, WriteTag, SetSecurityBit, Beep, Light, CapturePhoto | Nexus issues `Beep` and `Light`; the camera snapshot is taken through the camera adapter |
+| NCIP LookupUser returns a masked UserName | It returns `BlockOrTrap` and `UserFiscalAccountSummary`, without the name |
+| Audit filter `actor` | The filter parameter is `actor_id` |
+| `/health` status in the body only | 200 when healthy, 503 when a check fails (DEF-016) |

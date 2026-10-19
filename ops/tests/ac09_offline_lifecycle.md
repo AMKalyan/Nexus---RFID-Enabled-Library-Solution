@@ -38,3 +38,16 @@ Total time on the offline host: about 1 minute 40 seconds (00:22:40 to 00:24:17)
 - **Automatic rollback when an update is unhealthy** (`update.ps1` calls `rollback.ps1` after 120 s). It uses the same rollback path shown in step 3. A deliberately broken release was not built.
 - **Restoring the pre-update backup when the schema downgrade fails.** The restore itself is proven by AC 10.
 - **The shell scripts (`install.sh`, `update.sh`, `rollback.sh`)** were exercised only for bundle verification. The full lifecycle was run with the PowerShell scripts, which are the ones for the Windows target (NFR 03).
+
+## Release 1.0.2 update rehearsal (2026-10-19)
+
+The maintenance release 1.0.2 (DEF-015 to DEF-024, no schema change) was rehearsed with the network on; the offline mechanism itself is proven above. It ran beside the development stack, in a separate compose project (`nexus-rehearsal`, its own volumes) on ports 9443/9080. Runner: [`rehearse-release-1.0.2.ps1`](../../docs/06-testing/evidence/ac09/rehearse-release-1.0.2.ps1). Transcript: [`release-1.0.2-update-transcript.txt`](../../docs/06-testing/evidence/ac09/release-1.0.2-update-transcript.txt).
+
+| Step | Expected | Observed | Result |
+|---|---|---|---|
+| A1. Install 1.0.1 (`install.ps1 -Demo`) | Healthy, licence valid | `1.0.1`, schema `0004`, licence `valid` | Pass |
+| A2. Update to 1.0.2 (`update.ps1 nexus-1.0.2.zip`) | Backup first, 1.0.2 healthy | `1.0.2`, schema `0004`, build notes for DEF-015 to DEF-024 | Pass |
+| A3. Roll back (`rollback.ps1`) | 1.0.1 again, legacy data unchanged | `1.0.1`, schema `0004`; `IDENTICAL: 3 legacy tables, 4,677 rows` | Pass |
+| B1. Fresh 1.0.2 install with a licence issued beforehand (`-Licence … -LicenceKeyFile …`, DEF-020) | Licence valid without a demo licence | `licence: valid`; restart policy `unless-stopped` on `api`, `db`, `web` (DEF-018) | Pass |
+| B2. Security smoke checks against the install | All pass, including spoofed `X-Forwarded-For` (DEF-015) | 19 of 19 pass (exit 0) | Pass |
+| B3. Health with the database stopped (DEF-016) | 503, then 200 when it is back | `HTTP 503`, then `HTTP 200` | Pass |

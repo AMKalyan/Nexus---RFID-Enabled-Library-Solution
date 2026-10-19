@@ -1,0 +1,189 @@
+﻿**********************
+Windows PowerShell transcript start
+Start time: 20261019204507
+Username: [redacted]
+RunAs User: [redacted]
+Configuration Name: [redacted]
+Machine: [redacted]
+Host Application: [redacted]
+Process ID: [redacted]
+PSVersion: 5.1.26100.9711
+PSEdition: Desktop
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1.26100.9711
+BuildVersion: 10.0.26100.9711
+CLRVersion: 4.0.30319.42000
+WSManStackVersion: 3.0
+PSRemotingProtocolVersion: 2.3
+SerializationVersion: 1.1.0.1
+**********************
+
+===== A1. Install 1.0.1 from its bundle  [2026-10-19 20:45:07]
+bundle verified
+== loading images for 1.0.1
+
+== generating .env with new secrets
+== generating a self-signed TLS certificate (replace with the site's own certificate)
+
+== issuing a 30-day demonstration licence
+
+== starting Nexus 1.0.1
+
+== seeding synthetic demonstration data
+
+demo sign-in details: ops\demo-credentials.txt (keep private)
+version: {"version":"1.0.1","alembic_rev":"0004","licence":"valid","build_notes":"1.0.1: build notes on /version; administrators can publish a maintenance notice."}
+Nexus 1.0.1 is running at https://localhost:8443/
+version: {"version":"1.0.1","alembic_rev":"0004","licence":"valid","build_notes":"1.0.1: build notes on /version; administrators can publish a maintenance notice."}
+accession    rows=2377     sha256=b4a8f24117cd7bf49500939043c6edf5ba2559a78369fc130cdc707c7e14a576
+borrower     rows=300      sha256=581c9777e5eace4c6b1038862b81660cf6d6d02187993b9dfb087387654a4607
+catalogue    rows=2000     sha256=3b69cba43c42df09acf2933703074c76068885fcf04310e6d33d7c81e5e9dd0e
+report: /backups/reports/integrity-20261019T151551Z-before-update.json
+
+===== A2. Update 1.0.1 -> 1.0.2  [2026-10-19 20:45:51]
+== updating 1.0.1 (schema 0004) to 1.0.2
+== backup before update
+== loading images for 1.0.2
+
+== starting 1.0.2
+
+updated to 1.0.2: {"version":"1.0.2","alembic_rev":"0004","licence":"valid","build_notes":"1.0.2: security and robustness fixes (DEF-015 to DEF-024); see RELEASE-NOTES.md."}
+backup taken before the update: nexus-1.0.1-20261019T151554Z-pre-update-1-0-1-1-0-2.dump (rollback: ops\rollback.ps1)
+version: {"version":"1.0.2","alembic_rev":"0004","licence":"valid","build_notes":"1.0.2: security and robustness fixes (DEF-015 to DEF-024); see RELEASE-NOTES.md."}
+SERVICE   IMAGE                  STATUS
+api       nexus-api:1.0.2        Up 14 seconds (healthy)
+db        postgres:16.4-alpine   Up 19 seconds (healthy)
+web       nexus-web:1.0.2        Up 3 seconds
+
+===== A3. Roll back to 1.0.1  [2026-10-19 20:46:34]
+== rolling back 1.0.2 to 1.0.1 (schema 0004)
+
+
+schema downgraded to 0004
+
+rolled back to 1.0.1: {"version":"1.0.1","alembic_rev":"0004","licence":"valid","build_notes":"1.0.1: build notes on /version; administrators can publish a maintenance notice."}
+version: {"version":"1.0.1","alembic_rev":"0004","licence":"valid","build_notes":"1.0.1: build notes on /version; administrators can publish a maintenance notice."}
+accession    rows=2377     sha256=b4a8f24117cd7bf49500939043c6edf5ba2559a78369fc130cdc707c7e14a576
+borrower     rows=300      sha256=581c9777e5eace4c6b1038862b81660cf6d6d02187993b9dfb087387654a4607
+catalogue    rows=2000     sha256=3b69cba43c42df09acf2933703074c76068885fcf04310e6d33d7c81e5e9dd0e
+report: /backups/reports/integrity-20261019T151701Z-after-rollback.json
+IDENTICAL: 3 legacy tables, 4,677 rows
+compare exit code: 0
+docker :  Container nexus-rehearsal-web-1 Stopping 
+At D:\AC\nexus-offline-rehearsal\rehearse-102.ps1:48 char:5
++     docker compose down -v *> $null
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ( Container nexu...web-1 Stopping :String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ Container nexus-rehearsal-web-1 Stopped
+ Container nexus-rehearsal-web-1 Removing
+ Container nexus-rehearsal-web-1 Removed
+ Container nexus-rehearsal-api-1 Stopping
+ Container nexus-rehearsal-api-1 Stopped
+ Container nexus-rehearsal-api-1 Removing
+ Container nexus-rehearsal-api-1 Removed
+ Container nexus-rehearsal-db-1 Stopping
+ Container nexus-rehearsal-db-1 Stopped
+ Container nexus-rehearsal-db-1 Removing
+ Container nexus-rehearsal-db-1 Removed
+ Volume nexus-rehearsal_pgdata Removing
+ Network nexus-rehearsal_default Removing
+ Volume nexus-rehearsal_outbox Removing
+ Volume nexus-rehearsal_pgdata Removed
+ Volume nexus-rehearsal_backups Removing
+ Volume nexus-rehearsal_outbox Removed
+ Volume nexus-rehearsal_backups Removed
+ Network nexus-rehearsal_default Removed
+
+===== B1. Fresh 1.0.2 install with a licence issued beforehand and its key (DEF-020)  [2026-10-19 20:47:08]
+
+bundle verified
+== loading images for 1.0.2
+
+== generating .env with new secrets
+== generating a self-signed TLS certificate (replace with the site's own certificate)
+
+== starting Nexus 1.0.2
+
+
+== seeding synthetic demonstration data
+
+demo sign-in details: ops\demo-credentials.txt (keep private)
+version: {"version":"1.0.2","alembic_rev":"0004","licence":"valid","build_notes":"1.0.2: security and robustness fixes (DEF-015 to DEF-024); see RELEASE-NOTES.md."}
+Nexus 1.0.2 is running at https://localhost:8443/
+version: {"version":"1.0.2","alembic_rev":"0004","licence":"valid","build_notes":"1.0.2: security and robustness fixes (DEF-015 to DEF-024); see RELEASE-NOTES.md."}
+restart policies:
+/nexus-rehearsal-api-1=unless-stopped
+/nexus-rehearsal-db-1=unless-stopped
+/nexus-rehearsal-web-1=unless-stopped
+
+===== B2. Security smoke checks against the 1.0.2 install (DEF-015 included)  [2026-10-19 20:48:05]
+| Check | Observed | Result |
+|---|---|---|
+| No token on a protected endpoint → 401 | `401 ERR_UNAUTHENTICATED` | Pass |
+| Forged token → 401 | `401 ERR_TOKEN_INVALID` | Pass |
+| Circulation Clerk → admin endpoint → 403 | `403 ERR_FORBIDDEN` | Pass |
+| Patron → audit log → 403 | `403 ERR_FORBIDDEN` | Pass |
+| Patron → own loans → 200 | `200` | Pass |
+| Patron → another member's loans (IDOR) → 403 | `403 ERR_FORBIDDEN` | Pass |
+| Wrong password → 401 with a generic message | `401 {'error': 'Invalid username or password', 'code': 'INVALID_CREDENTIALS'}` | Pass |
+| No internal detail in response: GET /api/v1/items/not-a-uuid | `422 keys=['code', 'error', 'fields']` | Pass |
+| No internal detail in response: GET /api/v1/items/00000000-0000-0000-0000-000000000000 | `404 keys=['code', 'error']` | Pass |
+| No internal detail in response: POST /api/v1/circulation/checkout | `422 keys=['code', 'error', 'fields']` | Pass |
+| No internal detail in response: POST /api/v1/circulation/checkout | `422 keys=['code', 'error', 'fields']` | Pass |
+| No internal detail in response: GET /api/v1/opac/search?q=%27%3B%20DROP%20TABLE%20nexus.item%3B- | `200 keys=['ok']` | Pass |
+| Injection probe left the item table intact | `item lookup 200` | Pass |
+| Device event without a device key → 401 | `401 ERR_DEVICE_AUTH` | Pass |
+| Device event with a wrong device key → 401 | `401 ERR_DEVICE_AUTH` | Pass |
+| TLS security headers on the web front end | `all present` | Pass |
+| Plain HTTP redirects to the published HTTPS address | `301 → https://localhost:9443/opac → 200` | Pass |
+| Sign-in rate limit (10/minute) → 429, even with a spoofed X-Forwarded-For | `401 401 401 401 401 401 429 429 429 429 429 429` | Pass |
+| Audit log records the real client address, not a spoofed one | `10 entries from this run; recorded IPs ['172.19.0.1']` | Pass |
+smoke exit code: 0
+
+===== B3. Health reports 503 while the database is down (DEF-016)  [2026-10-19 20:48:08]
+docker :  Container nexus-rehearsal-db-1 Stopping 
+At D:\AC\nexus-offline-rehearsal\rehearse-102.ps1:68 char:5
++     docker compose stop db *> $null
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ( Container nexu...-db-1 Stopping :String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ Container nexus-rehearsal-db-1 Stopped
+health with db stopped: HTTP 503
+docker :  Container nexus-rehearsal-db-1 Starting 
+At D:\AC\nexus-offline-rehearsal\rehearse-102.ps1:71 char:5
++     docker compose start db *> $null
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ( Container nexu...-db-1 Starting :String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ Container nexus-rehearsal-db-1 Started
+health after db start: HTTP 200
+docker :  Container nexus-rehearsal-web-1 Stopping 
+At D:\AC\nexus-offline-rehearsal\rehearse-102.ps1:74 char:5
++     docker compose down -v *> $null
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ( Container nexu...web-1 Stopping :String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ Container nexus-rehearsal-web-1 Stopped
+ Container nexus-rehearsal-web-1 Removing
+ Container nexus-rehearsal-web-1 Removed
+ Container nexus-rehearsal-api-1 Stopping
+ Container nexus-rehearsal-api-1 Stopped
+ Container nexus-rehearsal-api-1 Removing
+ Container nexus-rehearsal-api-1 Removed
+ Container nexus-rehearsal-db-1 Stopping
+ Container nexus-rehearsal-db-1 Stopped
+ Container nexus-rehearsal-db-1 Removing
+ Container nexus-rehearsal-db-1 Removed
+ Network nexus-rehearsal_default Removing
+ Volume nexus-rehearsal_pgdata Removing
+ Volume nexus-rehearsal_backups Removing
+ Volume nexus-rehearsal_outbox Removing
+ Volume nexus-rehearsal_pgdata Removed
+ Volume nexus-rehearsal_backups Removed
+ Volume nexus-rehearsal_outbox Removed
+ Network nexus-rehearsal_default Removed
+RELEASE 1.0.2 REHEARSAL COMPLETED
+**********************
+Windows PowerShell transcript end
+End time: 20261019204824
+**********************

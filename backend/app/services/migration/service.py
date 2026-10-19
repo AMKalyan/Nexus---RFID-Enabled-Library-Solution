@@ -302,6 +302,15 @@ class MigrationService:
         batch = self._batch(batch_id)
         if batch.status != BatchStatus.validated:
             raise AppError("BATCH_NOT_VALIDATED", "Validate the batch before committing it", 409)
+        # Reconcile before anything is touched: source = valid + rejected + duplicate, and the staged valid
+        # rows must be exactly the ones the report counted (DEF-021).
+        staged_valid = self.session.scalar(
+            select(func.count())
+            .select_from(ImportRow)
+            .where(ImportRow.batch_id == batch.id, ImportRow.status == ImportStatus.valid)
+        )
+        if not self.report(batch.id).balanced or staged_valid != batch.rows_valid:
+            raise AppError("BATCH_NOT_BALANCED", "Counts do not reconcile; validate the batch again", 409)
         dump = backup.run_backup(f"pre-migration-{batch.id}")
         legacy_before = integrity.snapshot()
 

@@ -167,3 +167,23 @@ def test_nfr02_upload_row_cap(client, auth_headers, tmp_path, monkeypatch):
             "/api/v1/migration/batches", headers=auth_headers("Admin"), files={"file": ("rows.csv", f)}
         )
     assert r.status_code == 422 and r.json()["code"] == "UPLOAD_TOO_MANY_ROWS"
+
+
+def test_fr10_commit_refused_when_counts_do_not_reconcile(
+    client, db_session, auth_headers, sample_xlsx, ops_env
+):
+    """A batch whose recorded counts no longer match its staged rows is never committed (DEF-021)."""
+    from app.db.models import MigrationBatch
+
+    h = auth_headers("Admin")
+    batch = upload(client, h, sample_xlsx.path).json()["id"]
+    client.post(f"/api/v1/migration/batches/{batch}/validate", headers=h)
+    row = db_session.get(MigrationBatch, batch)
+    row.rows_valid += 1  # recorded counts drift from the staged rows
+    db_session.flush()
+
+    r = client.post(f"/api/v1/migration/batches/{batch}/commit", headers=h)
+    assert r.status_code == 409 and r.json()["code"] == "BATCH_NOT_BALANCED"
+    in_catalogue = select(func.count()).select_from(Item).where(Item.migration_batch_id == batch)
+    assert db_session.scalar(in_catalogue) == 0
+    assert not list(ops_env.glob("*.dump"))  # refused before any backup is taken

@@ -51,6 +51,7 @@ from app.db.models import (
     TagTarget,
 )
 from app.integrations.legacy_db import DbLegacyConnector
+from app.services.demo import public_password_for
 from app.services.validation import isbn13_valid  # noqa: F401  (re-exported for tests)
 
 SEED = 42
@@ -291,7 +292,7 @@ def seed_demo(session: Session) -> dict[str, str]:
     roles = {name: role_id for name, role_id in session.execute(select(Role.name, Role.id))}
     for username, role in STAFF:
         if session.scalar(select(StaffUser).where(StaffUser.username == username)) is None:
-            password = secrets.token_urlsafe(12)
+            password = public_password_for(get_settings(), username) or secrets.token_urlsafe(12)
             uid = secrets.token_hex(4).upper()
             creds[f"staff {username} ({role}) password"] = password
             creds[f"staff {username} smart-card UID"] = uid
@@ -309,7 +310,7 @@ def seed_demo(session: Session) -> dict[str, str]:
     patrons = session.scalars(select(Member).order_by(Member.card_no).limit(3)).all()
     for m in patrons:
         if m.password_hash is None:
-            password = secrets.token_urlsafe(12)
+            password = public_password_for(get_settings(), m.card_no) or secrets.token_urlsafe(12)
             creds[f"patron {m.card_no} password"] = password
             m.password_hash = hash_password(password)
     session.flush()

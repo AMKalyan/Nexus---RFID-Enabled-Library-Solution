@@ -773,6 +773,29 @@
         "title": "DayCount",
         "type": "object"
       },
+      "DemoAccountOut": {
+        "properties": {
+          "password": {
+            "title": "Password",
+            "type": "string"
+          },
+          "role": {
+            "title": "Role",
+            "type": "string"
+          },
+          "username": {
+            "title": "Username",
+            "type": "string"
+          }
+        },
+        "required": [
+          "role",
+          "username",
+          "password"
+        ],
+        "title": "DemoAccountOut",
+        "type": "object"
+      },
       "DeviceCreatedOut": {
         "properties": {
           "api_key": {
@@ -3114,7 +3137,7 @@
   },
   "info": {
     "title": "Nexus API",
-    "version": "1.0.2"
+    "version": "1.0.3"
   },
   "openapi": "3.1.0",
   "paths": {
@@ -3550,6 +3573,32 @@
         "summary": "Update User",
         "tags": [
           "administration"
+        ]
+      }
+    },
+    "/api/v1/auth/demo-accounts": {
+      "get": {
+        "description": "Sign-in details for a public demonstration instance; empty unless DEMO_PUBLIC_ACCOUNTS is on.",
+        "operationId": "demo_accounts_api_v1_auth_demo_accounts_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/DemoAccountOut"
+                  },
+                  "title": "Response Demo Accounts Api V1 Auth Demo Accounts Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Demo Accounts",
+        "tags": [
+          "auth"
         ]
       }
     },

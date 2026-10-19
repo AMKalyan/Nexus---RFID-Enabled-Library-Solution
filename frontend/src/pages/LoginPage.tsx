@@ -7,6 +7,10 @@ import { wsUrl } from "../lib/live";
 
 const CARD_READER = import.meta.env.VITE_CARD_READER ?? "CARD-01";
 
+type DemoAccount = { role: string; username: string; password: string };
+
+const ROLE_LABEL: Record<string, string> = { CirculationClerk: "Circulation Clerk" };
+
 export function LoginPage() {
   const { login, loginWithTokens } = useAuth();
   const navigate = useNavigate();
@@ -16,8 +20,16 @@ export function LoginPage() {
   const [busy, setBusy] = useState(false);
   const [waitingForCard, setWaitingForCard] = useState(false);
   const socket = useRef<WebSocket | null>(null);
+  const [demoAccounts, setDemoAccounts] = useState<DemoAccount[]>([]);
 
   useEffect(() => () => socket.current?.close(), []);
+
+  // Public demonstration instances list sign-in details; everywhere else the list is empty.
+  useEffect(() => {
+    api<DemoAccount[]>("/auth/demo-accounts")
+      .then((accounts) => setDemoAccounts(Array.isArray(accounts) ? accounts : []))
+      .catch(() => setDemoAccounts([]));
+  }, []);
 
   async function submit(e: FormEvent) {
     e.preventDefault();
@@ -71,7 +83,7 @@ export function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center">
+    <div className="flex min-h-screen flex-col items-center justify-center gap-4 py-8">
       <form onSubmit={submit} className="w-80 space-y-4 rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
         <h1 className="text-xl font-semibold text-indigo-700">Nexus sign in</h1>
         <label className="block text-sm">
@@ -113,6 +125,38 @@ export function LoginPage() {
           {waitingForCard ? `Tap your card on ${CARD_READER}…` : "Tap staff card"}
         </button>
       </form>
+      {demoAccounts.length > 0 && (
+        <section aria-labelledby="demo-accounts" className="w-80 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm">
+          <h2 id="demo-accounts" className="font-semibold text-amber-900">
+            Demo accounts
+          </h2>
+          <p className="mt-1 text-xs text-amber-800">Synthetic data on a demonstration instance.</p>
+          <ul className="mt-3 space-y-2">
+            {demoAccounts.map((a) => (
+              <li key={a.username} className="flex items-center justify-between gap-2">
+                <span>
+                  <span className="font-medium">{ROLE_LABEL[a.role] ?? a.role}</span>
+                  <br />
+                  <code className="text-xs text-slate-700">
+                    {a.username} / {a.password}
+                  </code>
+                </span>
+                <button
+                  type="button"
+                  aria-label={`Use the ${ROLE_LABEL[a.role] ?? a.role} account`}
+                  onClick={() => {
+                    setUsername(a.username);
+                    setPassword(a.password);
+                  }}
+                  className="rounded border border-amber-300 bg-white px-2 py-1 text-xs hover:bg-amber-100"
+                >
+                  Use
+                </button>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
     </div>
   );
 }

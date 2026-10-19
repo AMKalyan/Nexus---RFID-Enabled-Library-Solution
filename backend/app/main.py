@@ -90,6 +90,8 @@ def create_app(check_db: bool = True) -> FastAPI:
         app.state.health_checks.append(lambda: _database_check(app))
         _database_check(app)
     install_error_handlers(app)
+    if settings.demo_public_accounts:
+        log.warning("DEMO_PUBLIC_ACCOUNTS is on: the login page lists demo sign-in details")
     app.state.licence_status = status_from_file(
         Path(settings.licence_file), settings.licence_key.get_secret_value()
     )

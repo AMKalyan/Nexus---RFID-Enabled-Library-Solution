@@ -4,7 +4,7 @@ from fastapi.responses import JSONResponse
 from app.core.config import get_settings
 
 router = APIRouter(tags=["operations"])
-BUILD_NOTES = "1.0.1: build notes on /version; administrators can publish a maintenance notice."
+BUILD_NOTES = "1.0.2: security and robustness fixes (DEF-015 to DEF-023); see RELEASE-NOTES.md."
 
 
 @router.get("/version")

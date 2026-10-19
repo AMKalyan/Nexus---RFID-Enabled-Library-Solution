@@ -59,7 +59,6 @@ def test_load_device_keys_from_credentials_file(tmp_path):
 
 def test_gate_event_queued_during_outage_is_marked_offline(tmp_path, monkeypatch):
     import httpx
-
     import sim
 
     monkeypatch.setattr(sim, "STATE_DIR", tmp_path)
@@ -78,7 +77,6 @@ def test_gate_event_queued_during_outage_is_marked_offline(tmp_path, monkeypatch
 def test_replay_keeps_events_refused_for_a_retryable_reason(tmp_path, monkeypatch):
     """Throttled, unauthorised or failed replays stay queued, in order (DEF-022)."""
     import httpx
-
     import sim
 
     monkeypatch.setattr(sim, "STATE_DIR", tmp_path)
@@ -99,7 +97,6 @@ def test_replay_keeps_events_refused_for_a_retryable_reason(tmp_path, monkeypatc
 
 def test_replay_drops_events_nexus_rejects_as_invalid(tmp_path, monkeypatch):
     import httpx
-
     import sim
 
     monkeypatch.setattr(sim, "STATE_DIR", tmp_path)

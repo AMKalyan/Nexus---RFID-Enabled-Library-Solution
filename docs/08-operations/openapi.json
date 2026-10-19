@@ -3114,7 +3114,7 @@
   },
   "info": {
     "title": "Nexus API",
-    "version": "1.0.0"
+    "version": "1.0.2"
   },
   "openapi": "3.1.0",
   "paths": {
@@ -4782,15 +4782,13 @@
     },
     "/api/v1/health": {
       "get": {
+        "description": "200 when every check passes, 503 otherwise: Docker and the update roll-back read the status code.",
         "operationId": "health_api_v1_health_get",
         "responses": {
           "200": {
             "content": {
               "application/json": {
-                "schema": {
-                  "title": "Response Health Api V1 Health Get",
-                  "type": "object"
-                }
+                "schema": {}
               }
             },
             "description": "Successful Response"

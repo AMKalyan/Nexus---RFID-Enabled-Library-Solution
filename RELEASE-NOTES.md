@@ -1,5 +1,22 @@
 # Release Notes
 
+## 1.0.2 (2026-10-19)
+
+Security and robustness release. No schema change (revision `0004`).
+
+- **Client address cannot be spoofed (DEF-015).** nginx now overwrites `X-Forwarded-For`, so sign-in rate limits hold and the audit log records the real client address.
+- **`/api/v1/health` returns 503 when a check fails (DEF-016).** The Docker health check and the update's automatic rollback now see a database failure.
+- **SIP2 listener (DEF-017):** an empty `SIP2_ALLOWED_HOSTS` refuses every connection.
+- **SIP2 Patron Status (DEF-023)** carries initials instead of the member's full name.
+- **Containers restart after a host or Docker restart (DEF-018).**
+- **`ops/restore.sh` restarts the services when a restore fails (DEF-019).**
+- **Installation (DEF-020):** `--licence-key-file` / `-LicenceKeyFile` installs a pre-issued licence with the key it was signed with. A newly installed licence takes effect immediately.
+- **Migration commit reconciles the counts before it starts (DEF-021).** It returns `BATCH_NOT_BALANCED` when they don't balance.
+- **Device simulator (DEF-022):** replays keep events refused with 401, 403 or 429.
+- The 1.0.1 build note said administrators could "publish" a maintenance notice. The `maintenance_notice` setting is stored and returned by the settings API, but no screen displays it yet (production backlog).
+
+Update from 1.0.1 with `ops/update.ps1 nexus-1.0.2.zip` (or `update.sh`); roll back with `ops/rollback.ps1`.
+
 ## 1.0.1 (2026-10-08)
 
 Maintenance release used to prove the offline update and rollback path (AC 09).
@@ -26,4 +43,4 @@ First release of the Nexus RFID library solution prototype. All acceptance scena
 
 Schema revision: `0003`.
 
-Known limitations: see `docs/09-demo/known-limitations.md`. These include DEF-008 (latency at 50 concurrent users with one API process) and HMAC-based licences (the site holds the verification key).
+Known limitations: see [`docs/09-demo/known-limitations.md`](docs/09-demo/known-limitations.md). These include DEF-008 (latency at 50 concurrent users with one API process) and HMAC-based licences (the site holds the verification key).

@@ -1,71 +1,82 @@
 # Nexus — RFID-Enabled Library Solution
 
-Nexus is a modular prototype that adds RFID workflows to an existing Integrated Library Management System (ILMS) **without modifying, deleting or corrupting existing library records**. The workflows are tagging, circulation, inventory, security gates and smart-card sign-in. It also adds reporting, data migration and offline lifecycle management.
+Nexus adds RFID to an existing library management system. Staff can tag books, issue and return them, check shelves with a handheld reader, catch unissued books at the exit gate, and sign in with a smart card. It also provides reports, a spreadsheet migration tool, and offline install, update and rollback.
 
-All external devices and services are integrated through documented adapter interfaces with working mocks: RFID readers, handhelds, gates, smart cards, CCTV, email, SMS, printing, the legacy ILMS, and NCIP/SIP2 endpoints. All data and credentials in this repository are synthetic.
+The one firm rule: **existing library records are never changed, deleted or corrupted.**
 
-**Current release: 1.0.3** (schema revision `0004`). See [RELEASE-NOTES.md](RELEASE-NOTES.md).
+There is no real hardware in this project. Every device and outside service (RFID readers, gates, CCTV, email, SMS, the old library system) has a working mock, and a device simulator stands in for the readers. All data is synthetic.
 
-## Acceptance scenarios
+## What it does
 
-| AC | Scenario | Evidence |
-|---|---|---|
-| AC 01 | Spreadsheet migration: stage, validate, de-duplicate, commit, reconcile | [Migration run report](docs/05-data-migration/migration-run-report.md) (20,000 = 19,200 + 600 + 200) |
-| AC 02 | Locate an item, validate it, associate an RFID tag | [UAT](docs/06-testing/uat-checklist.md) |
-| AC 03 | Check out, renew and check in through the desk, NCIP and SIP2, with audit | [UAT](docs/06-testing/uat-checklist.md) |
-| AC 04 | Refuse reference items, blocked members, fines over the limit | [UAT](docs/06-testing/uat-checklist.md) |
-| AC 05 | Handheld inventory: missing and misplaced items, with beep and light cues | [UAT](docs/06-testing/uat-checklist.md) |
-| AC 06 | Security gate alarm with mock CCTV snapshot and queued notification | [UAT](docs/06-testing/uat-checklist.md) |
-| AC 07 | Staff smart-card sign-in with role-based permissions | [UAT](docs/06-testing/uat-checklist.md) |
-| AC 08 | Dashboard and filterable reports with CSV/PDF export | [UAT](docs/06-testing/uat-checklist.md) |
-| AC 09 | Offline install, update and rollback | [Offline rehearsal](ops/tests/ac09_offline_lifecycle.md) |
-| AC 10 | Restore after a damaging change; legacy data proven identical | [Restore and integrity report](docs/05-data-migration/restore-and-integrity-report.md) |
-
-Every test is traced to a requirement in the [test-to-requirement matrix](docs/06-testing/test-to-requirement-matrix.md). Results: [test results](docs/06-testing/test-results.md).
-
-## Repository map
-
-| Path | Purpose |
+| Area | Features |
 |---|---|
-| `backend/` | FastAPI application, RFID middleware, interop (NCIP, SIP2) and integration adapters; tests in `backend/tests/` |
-| `frontend/` | React staff UI, OPAC, dashboard and administration |
-| `device-sim/` | RFID device simulator: staff reader, handheld, gate, smart card, camera |
-| `migration/` | Spreadsheet migration utility and synthetic data generator |
-| `ops/` | Offline bundle build, install, update, rollback, backup, restore, integrity and licence tooling |
-| `docs/` | Deliverables D1–D9 (below) |
+| Cataloguing and search | Books and copies, barcodes, spine labels, full-text search, a public catalogue (OPAC), a virtual bookshelf |
+| Circulation | Issue, renew and return, with rules per member category (loan days, item limits, fines); reference books and blocked members are refused |
+| RFID | Tag a copy, scan a shelf with a handheld (finds missing and misplaced books), security gate alarm with a camera snapshot and email alert |
+| Sign-in | Username and password, or a staff smart-card tap; five roles: Admin, Librarian, Circulation Clerk, Auditor, Patron |
+| Partner systems | NCIP and SIP2 interfaces for self-check kiosks and other libraries |
+| Reports | Live dashboard and filterable reports, exportable as CSV or PDF |
+| Migration | Import a 20,000-row spreadsheet: validate, remove duplicates, commit in one step, reconcile the counts |
+| Operations | Backup and restore, a check that proves the old data is unchanged, offline install, update and rollback |
 
-| Deliverable | Location |
-|---|---|
-| Project control: standards, plan, stage gates, defect log, issue tracker | [`docs/00-project-control/`](docs/00-project-control/) |
-| D1 Requirements: RTM, use cases, data dictionary | [`docs/01-requirements/`](docs/01-requirements/) |
-| D2 Architecture: design, security, interfaces, ADRs | [`docs/02-design/`](docs/02-design/) |
-| D3 Working prototype | `backend/`, `frontend/`, `device-sim/` |
-| D4 Source repository: branching, SBOM and licences | [`docs/04-repository/`](docs/04-repository/) |
-| D5 Database and migration | [`docs/05-data-migration/`](docs/05-data-migration/) |
-| D6 Test package | [`docs/06-testing/`](docs/06-testing/) |
-| D7 Deployment package | [`docs/07-deployment/`](docs/07-deployment/) |
-| D8 Operational documentation | [`docs/08-operations/`](docs/08-operations/) |
-| D9 Demonstration: script, limitations, backlog | [`docs/09-demo/`](docs/09-demo/) |
+## Architecture
 
-## Delivery process
+```mermaid
+flowchart TB
+    users["Staff and patrons<br/>(web browser)"]
+    devices["RFID devices<br/>or the device simulator"]
+    partners["Kiosks and partner libraries<br/>(NCIP, SIP2)"]
 
-Development follows the AISYS Software Development SOP §9 stage by stage. Each stage was delivered on a `stage/N-*` branch, closed by a stage-gate record in [`docs/00-project-control/stage-gates/`](docs/00-project-control/stage-gates/), merged into `main` with `--no-ff` and tagged `sop-stage-N`. Defects were fixed on `fix/DEF-NNN-*` branches. The releases are tagged `v1.0.0`, `v1.0.1` and `v1.0.2`, and the evaluation release is `v1.0.0-eval`.
+    subgraph stack["Docker Compose"]
+        web["web: nginx<br/>HTTPS, serves the React app"]
+        api["api: FastAPI<br/>business rules, RFID middleware,<br/>NCIP/SIP2, mock adapters"]
+        subgraph db["db: PostgreSQL"]
+            legacy[("legacy_ilms<br/>existing records<br/>read-only")]
+            nexus[("nexus<br/>Nexus data and audit log")]
+            staging[("staging<br/>migration rows")]
+        end
+    end
 
-## Install from an offline bundle
-
-```bash
-sh ops/build_bundle.sh 1.0.2        # on a build machine: produces ops/bundles/nexus-1.0.2.zip
+    users --> web
+    devices --> web
+    partners --> web
+    web -->|/api| api
+    api --> nexus
+    api --> staging
+    api -.->|read only| legacy
 ```
 
-On the target host, unzip the bundle and follow the [installation guide](docs/07-deployment/installation-guide.md):
+- **web:** nginx terminates HTTPS, serves the React user interface and passes `/api` requests to the API.
+- **api:** one FastAPI application. Routers handle HTTP; services hold the rules; adapters connect to devices and outside services, mocked here.
+- **db:** PostgreSQL with three schemas. The application's database account can only **read** `legacy_ilms`, so the old records are protected by the database itself, not just by the code.
 
-```powershell
-powershell -ExecutionPolicy Bypass -File ops\install.ps1 -Demo
-```
+**Technology:** Python 3.12, FastAPI, SQLAlchemy, Alembic, React, TypeScript, Vite, Tailwind CSS, PostgreSQL 16, Docker Compose.
 
-## Build and run (development)
+## How it works
 
-Prerequisites: Docker Desktop (Linux containers), Python 3.12, Node 22, and Git Bash or another POSIX shell.
+**A book being issued**
+
+1. A clerk scans the member card and the book at the circulation desk.
+2. The API checks the member's category rules: loan limit, fines, member status, reference-only items.
+3. If allowed, it records the loan, clears the tag's security bit and writes an audit entry. If not, the desk shows the reason.
+4. A self-check kiosk using NCIP or SIP2 goes through the same rules.
+
+**A book leaving through the gate**
+
+1. The gate reader sends the tag it saw to the API.
+2. The API checks whether that copy is on loan.
+3. If it isn't, the API raises an alarm, attaches a camera snapshot, queues an email alert and shows it live on the Gate monitor screen.
+
+**A spreadsheet migration**
+
+1. **Upload:** every row is stored untouched in `staging`.
+2. **Validate:** each row is checked against the rules, and duplicates are marked. Nothing reaches the catalogue yet.
+3. **Commit:** a backup is taken first, then all valid rows are added in one transaction. A fingerprint of the old records is compared before and after; any change cancels the batch.
+4. **Reconcile:** source rows = valid + rejected + duplicates. A batch can also be rolled back on its own.
+
+## Getting started
+
+You need Docker Desktop (Linux containers) and Git. Use Git Bash on Windows.
 
 ```bash
 cp .env.example .env              # then replace every placeholder value
@@ -75,40 +86,67 @@ docker compose exec api python -m app.db.seed --legacy 2000 --demo
 docker compose cp api:/app/ops/demo-credentials.txt ops/demo-credentials.txt
 ```
 
-- Application: https://localhost:8443 (self-signed certificate)
-- API documentation: https://localhost:8443/api/docs
-- Generated demo credentials: `ops/demo-credentials.txt` (git-ignored)
+- Open https://localhost:8443 and accept the self-signed certificate.
+- Sign-in details for each role are in `ops/demo-credentials.txt`, which is generated on your machine and never committed.
+- API documentation is at https://localhost:8443/api/docs.
 
-To run the API and UI without containers:
-
-```bash
-cd backend && python -m venv .venv && .venv/Scripts/pip install -r requirements-dev.txt
-.venv/Scripts/alembic upgrade head && .venv/Scripts/uvicorn app.main:app --reload    # :8000
-cd frontend && npm ci && npm run dev                                                  # :5173
-```
-
-The `docker-compose.dev.yml` override exposes PostgreSQL on `localhost:5433` for the test suite and runs the API with `ENVIRONMENT=dev`. Without it, the API image runs in production mode and refuses to start with development or placeholder secrets.
-
-To use the operator scripts (`ops/backup.sh`, `ops/restore.sh`, …) against a development stack, include the override for those commands too:
+To act as an RFID device, use the simulator:
 
 ```bash
-COMPOSE_FILE="docker-compose.yml;docker-compose.dev.yml" sh ops/restore.sh <file>
+python device-sim/sim.py heartbeat --all
+python device-sim/sim.py gate --gate GATE-01 --epc <tag EPC> --direction out
 ```
 
-On Linux and macOS, separate the two files with `:` instead of `;`.
-
-## Quality checks
+## Running the tests
 
 ```bash
-bash ops/ci-local.sh              # format, lint, types, bandit, dependency audits, all tests, build
+bash ops/ci-local.sh
 ```
 
-The same steps run in [`.github/workflows/ci.yml`](.github/workflows/ci.yml).
+This runs formatting, lint, type and security checks, dependency audits, and all tests: backend, simulator, migration tools and frontend. The same steps run in GitHub Actions.
 
-## Hosting a public demonstration
+## Project structure
 
-Netlify or Vercel alone cannot run Nexus, which needs an always-on API with WebSockets and PostgreSQL. [Hosting options](docs/07-deployment/hosting-options.md) covers a single VM (recommended), a split UI/API set-up, and the publication checklist. On a demonstration instance, `DEMO_PUBLIC_ACCOUNTS=true` lists non-admin demo sign-in details on the login page.
+| Folder | Contents |
+|---|---|
+| `backend/` | FastAPI application and its tests |
+| `frontend/` | React user interface |
+| `device-sim/` | RFID device simulator |
+| `migration/` | Spreadsheet import tool and sample data generator |
+| `ops/` | Install, update, rollback, backup, restore and integrity scripts |
+| `docs/` | Requirements, design, testing, deployment, operations and demo documents |
 
-## Known limitations
+## Development workflow
 
-See [`docs/09-demo/known-limitations.md`](docs/09-demo/known-limitations.md) and the [production backlog](docs/09-demo/production-backlog.md).
+The project was built stage by stage, following a software development SOP:
+
+| Stage | Focus |
+|---|---|
+| 1 | Initiation and controls |
+| 2 | Requirements and design |
+| 3 | Foundation: auth, roles, audit, database, pipeline |
+| 4 | Core library functions |
+| 5 | RFID middleware and integrations |
+| 6 | Migration and data safety |
+| 7 | Verification |
+| Release | Deployment, operations and demo documents |
+
+Each stage was:
+1. built on its own `stage/N-*` branch
+2. reviewed in a gate record in [`docs/00-project-control/stage-gates/`](docs/00-project-control/stage-gates/)
+3. merged into `main` and tagged `sop-stage-N`
+
+Bugs were fixed on `fix/DEF-NNN-*` branches and are listed in the [defect log](docs/00-project-control/defect-log.md).
+
+## Documentation
+
+| Topic | Where |
+|---|---|
+| Requirements and traceability | [`docs/01-requirements/`](docs/01-requirements/) |
+| Architecture and design decisions | [`docs/02-design/`](docs/02-design/) |
+| Database and migration | [`docs/05-data-migration/`](docs/05-data-migration/) |
+| Tests and results | [`docs/06-testing/`](docs/06-testing/) |
+| Installation and configuration | [`docs/07-deployment/`](docs/07-deployment/) |
+| Administration, user and API guides | [`docs/08-operations/`](docs/08-operations/) |
+| Demo script and known limitations | [`docs/09-demo/`](docs/09-demo/) |
+| Release history | [RELEASE-NOTES.md](RELEASE-NOTES.md) |

@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Request
+from fastapi.responses import JSONResponse
 
 from app.core.config import get_settings
 
@@ -17,6 +18,9 @@ def version(request: Request) -> dict:
 
 
 @router.get("/health")
-def health(request: Request) -> dict:
+def health(request: Request) -> JSONResponse:
+    """200 when every check passes, 503 otherwise: Docker and the update roll-back read the status code."""
     results = {name: ok for name, ok in (check() for check in request.app.state.health_checks)}
-    return {"status": "ok" if all(results.values()) else "degraded", "checks": results}
+    healthy = all(results.values())
+    body = {"status": "ok" if healthy else "degraded", "checks": results}
+    return JSONResponse(body, status_code=200 if healthy else 503)

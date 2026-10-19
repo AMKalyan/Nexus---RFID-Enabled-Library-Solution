@@ -10,6 +10,7 @@ from app.core.ratelimit import limiter
 from app.core.security import revoke_refresh_token, rotate_refresh_token
 from app.db.base import get_session
 from app.db.models import Device, DeviceType
+from app.services.demo import public_accounts
 from app.services.smartcard import challenges
 from app.services.users import authenticate_password, issue_tokens, role_of, token_response
 
@@ -124,6 +125,19 @@ class ChallengeOut(BaseModel):
 
 class CardLoginIn(ChallengeIn):
     challenge_id: str = Field(min_length=10, max_length=64)
+
+
+class DemoAccountOut(BaseModel):
+    role: str
+    username: str
+    password: str
+
+
+@router.get("/demo-accounts", response_model=list[DemoAccountOut])
+@limiter.limit(get_settings().rate_limit_auth)
+def demo_accounts(request: Request) -> list[dict[str, str]]:
+    """Sign-in details for a public demonstration instance; empty unless DEMO_PUBLIC_ACCOUNTS is on."""
+    return public_accounts(get_settings())
 
 
 @router.post("/smartcard/challenge", response_model=ChallengeOut)

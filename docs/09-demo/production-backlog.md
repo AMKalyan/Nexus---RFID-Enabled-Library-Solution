@@ -55,7 +55,7 @@ Sizes are planning estimates, not commitments. Items that depend on a vendor (SD
 | [NX-126](#nx-126) | Verification on Windows Server 2022 | Compatibility | P1 | S | NFR 03 Partial |
 | [NX-127](#nx-127) | Rehearse the remaining offline-lifecycle paths | Operations | P2 | S | AC 09 rehearsal |
 | [NX-128](#nx-128) | Display the maintenance notice and UI banner | User interface | P3 | S | Release 1.0.2 review |
-| [NX-129](#nx-129) | Show a failing health check on the System health screen | Operations | P2 | S | Release 1.0.2 review |
+| [NX-129](#nx-129) | Show a failing health check on the System health screen | Operations | Done | S | Fixed in 1.0.2 (DEF-024) |
 
 P1 total: 12 items. A suggested order for them is in [Sequencing](#sequencing).
 
@@ -93,7 +93,7 @@ P1 total: 12 items. A suggested order for them is in [Sequencing](#sequencing).
 | <a id="nx-126"></a>NX-126 | Verification on Windows Server 2022 | P1 / S | Repeat the AC 09 offline rehearsal and the UAT checklist on Windows Server 2022 with Docker (Linux containers), and record the evidence to close NFR 03 |
 | <a id="nx-127"></a>NX-127 | Rehearse the remaining offline-lifecycle paths | P2 / S | Build a deliberately unhealthy release and record the automatic rollback by `update.ps1`; force a failed schema downgrade and record the restore of the pre-update backup; run the full install, update and rollback with the shell scripts on Linux ([rehearsal, "Not exercised"](../../ops/tests/ac09_offline_lifecycle.md#not-exercised-in-this-rehearsal)). Since 1.0.2 (DEF-016) `/api/v1/health` answers 503 when the database check fails, so a release whose API starts but cannot use the database is now detected as unhealthy; the rehearsal should include that case |
 | <a id="nx-128"></a>NX-128 | Display the maintenance notice and UI banner | P3 / S | Show `maintenance_notice` and `ui_banner` on the staff screens and the OPAC when they are set, escaped as plain text. Today both settings are stored and returned by the settings API only |
-| <a id="nx-129"></a>NX-129 | Show a failing health check on the System health screen | P2 / S | Read the body of a `503` answer from `/api/v1/health` so the screen shows `degraded` and the failing check, and clear the last successful result when a refresh fails. Add a front-end test for both cases |
+| <a id="nx-129"></a>NX-129 | Show a failing health check on the System health screen | Done / S | Fixed in release 1.0.2 (DEF-024): the screen reads the 503 report. |
 
 ## Sequencing
 
@@ -102,5 +102,5 @@ P1 total: 12 items. A suggested order for them is in [Sequencing](#sequencing).
 | 1. Site readiness | NX-126, NX-125, NX-111, NX-107, NX-108 | Run on the target platform with the site's certificate and data source, and allow kiosks to be connected |
 | 2. Hardware and messaging | NX-101, NX-112, NX-106, NX-104 | Real devices, tags and cards replace the simulator; alerts reach staff |
 | 3. Capacity and assurance | NX-063, NX-123, NX-121 | Load at peak, lawful data handling and an independent security test before go-live |
-| 4. Full scope | NX-109, NX-110, NX-113, NX-114, NX-102, NX-103, NX-117, NX-119, NX-120, NX-122, NX-127, NX-129, NX-064 | Complete the SOP functional scope and harden operations |
+| 4. Full scope | NX-109, NX-110, NX-113, NX-114, NX-102, NX-103, NX-117, NX-119, NX-120, NX-122, NX-127, NX-064 | Complete the SOP functional scope and harden operations |
 | 5. Later | NX-105, NX-115, NX-116, NX-118, NX-124, NX-128 | On demand |

@@ -283,4 +283,13 @@ GET /api/v1/version    -> {"version": "1.0.2", "alembic_rev": "0004", "licence":
 
 `/health` answers HTTP 200 when every check passes and HTTP 503 with `"status": "degraded"` when any check fails (since 1.0.2, DEF-016). The Docker health check and the update's automatic rollback read the status code. The only check in 1.0.2 is the database.
 
-The **System health** screen does not display the body of a 503 answer. Opened while a check fails, it shows the overall badge as not ok with no checks listed; left open when a check starts failing, it keeps showing the last successful result. Use `docker compose ps` (`api` becomes `unhealthy`) or request `/api/v1/health` directly to see the current state. For backups, restore, update and rollback see the [troubleshooting runbook](troubleshooting-runbook.md) and the offline lifecycle rehearsal ([`ops/tests/ac09_offline_lifecycle.md`](../../ops/tests/ac09_offline_lifecycle.md)).
+The **System health** screen reads the 503 report too (DEF-024): while a check fails it shows the overall badge as not ok and marks the failing check, refreshing every 15 seconds. `docker compose ps` shows the same state (`api` becomes `unhealthy`). For backups, restore, update and rollback see the [troubleshooting runbook](troubleshooting-runbook.md) and the offline lifecycle rehearsal ([`ops/tests/ac09_offline_lifecycle.md`](../../ops/tests/ac09_offline_lifecycle.md)).
+
+## 11. Public demonstration instance
+
+On a demonstration instance with synthetic data only, `DEMO_PUBLIC_ACCOUNTS=true` makes the login page list sign-in details for the Librarian, Circulation Clerk, Auditor and Patron `B00001` accounts, each with a **Use** button. `GET /api/v1/auth/demo-accounts` serves the list (an empty list when the setting is off).
+
+- The four accounts receive `DEMO_PUBLIC_PASSWORD` when the demo seed creates them; set it before seeding. Every other account, Admin included, keeps a random password, written to `ops/demo-credentials.txt` on the server only.
+- Admin is never listed, so visitors cannot change users, devices, settings or migrations.
+- Reset the instance regularly from a clean backup; see [hosting options](../07-deployment/hosting-options.md).
+- Never turn this on for a real library.

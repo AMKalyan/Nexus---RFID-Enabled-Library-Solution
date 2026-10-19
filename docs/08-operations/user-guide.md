@@ -215,7 +215,7 @@ The Admin has every permission and sees every screen. Tasks specific to the role
 - **Administration**: create staff users, activate or deactivate them, and edit circulation policies. See the [administrator guide](administrator-guide.md#2-staff-users).
 - **Migration**: stage, validate, commit and roll back spreadsheet imports.
 - **Audit log**: as for the Auditor.
-- **System health**: database check, application version, database revision and licence status. While a check is failing the screen does not show the current result (see the [administrator guide](administrator-guide.md#10-health-and-version)).
+- **System health**: database check, application version, database revision and licence status. A failing check is marked as failing (see the [administrator guide](administrator-guide.md#10-health-and-version)).
 
 ![Migration batches](../06-testing/evidence/uat/ac01-migration-batches.jpg)
 

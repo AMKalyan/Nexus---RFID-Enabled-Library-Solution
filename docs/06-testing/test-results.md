@@ -2,8 +2,8 @@
 
 | Field | Value |
 |---|---|
-| Date | 2026-10-19 (release 1.0.2 run of record; the Stage 7 gate run was on 2026-10-08) |
-| Branch | `release/1.0.0` at release 1.0.2, after the release-stage fixes DEF-015 to DEF-024 |
+| Date | 2026-10-19 (release 1.0.3 run of record; the Stage 7 gate run was on 2026-10-08) |
+| Branch | `feature/demo-accounts` at release 1.0.3 (release 1.0.2 fixes DEF-015 to DEF-024 included) |
 | Command | `bash ops/ci-local.sh` (same steps as `.github/workflows/ci.yml`), then the simulator, migration-tool and acceptance suites with JUnit output |
 | Environment | Windows 11 host (i5-1240P, 16 GB); Python 3.12.6; Node 22; PostgreSQL 16.4 container via `docker-compose.dev.yml` |
 
@@ -16,11 +16,11 @@
 | Types | `mypy app nexus_ops` | No issues |
 | Static security analysis | `bandit -r app nexus_ops` | 0 issues ([security checks](security-checks.md)) |
 | Python dependencies | `pip-audit` | No known vulnerabilities |
-| Backend tests (unit, integration, acceptance, regression) | `pytest --cov=app` | **247 passed, 0 failed**; line coverage **92%** |
+| Backend tests (unit, integration, acceptance, regression) | `pytest --cov=app` | **251 passed, 0 failed**; line coverage **93%** |
 | Simulator, migration and ops tooling | `ruff format --check`, `ruff check` | Clean |
 | Device simulator | `pytest` | 8 passed |
 | Migration tools | `pytest` | 5 passed |
-| Frontend types and tests | `tsc -b`, `vitest run` | Pass; 11 passed in 4 files |
+| Frontend types and tests | `tsc -b`, `vitest run` | Pass; 13 passed in 5 files |
 | Frontend dependencies | `npm audit --audit-level=high` | 0 vulnerabilities |
 | Frontend build | `vite build` | Pass |
 | Pipeline exit status | `ops/ci-local.sh` | 0. A forced failure exits non-zero since DEF-011 |
@@ -29,7 +29,7 @@
 
 | Type | Suite | Result |
 |---|---|---|
-| Functional and integration | `backend/tests/unit`, `backend/tests/integration` | Pass (included in the 247) |
+| Functional and integration | `backend/tests/unit`, `backend/tests/integration` | Pass (included in the 251) |
 | Acceptance (AC 01–08, AC 10) | `pytest -m acceptance` → [`junit-acceptance.xml`](junit-acceptance.xml) | 85 passed, 0 failed |
 | Regression | `backend/tests/regression/test_api_contract.py` | 2 passed; no endpoint removed, snapshot current (62 paths) |
 | Performance | `backend/tests/perf/perf_async.py` | 0 errors. Q-08 met at 10 users, missed at 50 (DEF-008, known limitation) ([performance results](performance-results.md)) |
@@ -39,7 +39,7 @@
 | Offline update and rollback | AC 09 rehearsal with networking off, plus `test_bundle_scripts.sh` and `test_migrations.py` | Install 1.0.0, update to 1.0.1 and roll back all pass; legacy data IDENTICAL; release 1.0.2 update from 1.0.1 and rollback also pass (network on) ([rehearsal](../../ops/tests/ac09_offline_lifecycle.md)) |
 | User acceptance | [UAT checklist](uat-checklist.md) | AC 01–08 and AC 10 pass in the browser; AC 09 passes in the offline rehearsal |
 
-Traceability: [`test-to-requirement-matrix.md`](test-to-requirement-matrix.md). It covers 260 JUnit test cases (backend, simulator and migration tools), all passing; 248 are traced to a requirement by name.
+Traceability: [`test-to-requirement-matrix.md`](test-to-requirement-matrix.md). It covers 264 JUnit test cases (backend, simulator and migration tools), all passing; 252 are traced to a requirement by name.
 
 ## Coverage notes
 

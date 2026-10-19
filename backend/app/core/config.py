@@ -51,6 +51,17 @@ class Settings(BaseSettings):
     run_worker: bool = True
     licence_file: str = "licence.json"
     licence_key: SecretStr = SecretStr("dev-licence-key")
+    # Public demonstration instances only: list sign-in details for every role except Admin on the login page.
+    demo_public_accounts: bool = False
+    demo_public_password: str = ""
+
+    @model_validator(mode="after")
+    def _demo_accounts_need_a_password(self) -> "Settings":
+        if self.demo_public_accounts and len(self.demo_public_password) < 12:
+            raise ValueError(
+                "DEMO_PUBLIC_PASSWORD must be at least 12 characters when DEMO_PUBLIC_ACCOUNTS is on"
+            )
+        return self
 
     @model_validator(mode="after")
     def _refuse_insecure_secrets(self) -> "Settings":

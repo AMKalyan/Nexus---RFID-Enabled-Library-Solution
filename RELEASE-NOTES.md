@@ -1,5 +1,13 @@
 # Release Notes
 
+## 1.0.3 (2026-10-19)
+
+Feature release for public demonstrations. No schema change (revision `0004`).
+
+- **Demo sign-in details on the login page** (off by default). With `DEMO_PUBLIC_ACCOUNTS=true` and a `DEMO_PUBLIC_PASSWORD`, the login page lists the Librarian, Circulation Clerk, Auditor and Patron `B00001` accounts with a **Use** button, served by `GET /api/v1/auth/demo-accounts`. Admin is never listed and keeps a random password.
+- **New guide:** [hosting options](docs/07-deployment/hosting-options.md) for a public demonstration, explaining why Netlify or Vercel alone cannot host the API.
+- The offline bundle for 1.0.3 was not rehearsed separately: the install, update and rollback scripts are unchanged since 1.0.2.
+
 ## 1.0.2 (2026-10-19)
 
 Security and robustness release. No schema change (revision `0004`).

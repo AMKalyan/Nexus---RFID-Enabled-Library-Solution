@@ -4,7 +4,7 @@ from fastapi.responses import JSONResponse
 from app.core.config import get_settings
 
 router = APIRouter(tags=["operations"])
-BUILD_NOTES = "1.0.2: security and robustness fixes (DEF-015 to DEF-024); see RELEASE-NOTES.md."
+BUILD_NOTES = "1.0.3: optional demo sign-in details on the login page; see RELEASE-NOTES.md."
 
 
 @router.get("/version")

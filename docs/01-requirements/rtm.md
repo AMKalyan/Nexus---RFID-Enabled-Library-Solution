@@ -36,13 +36,13 @@ Module and test columns are filled in from Stage 2 (design) and Stage 7 (verific
 |---|---|---|---|---|---|
 | NFR 01 | Data integrity | Back up existing DB before integration; never modify/delete/corrupt existing records | `legacy_ilms` schema read-only via DB grants; mandatory backup before migration/update; checksum integrity tool | `ops/integrity.py` before/after report; AC 10 test; **Stage 3:** `test_nfr01_app_role_cannot_modify_legacy` (4 cases), `test_nfr01_mirror_copies_without_touching_legacy`; **Stage 6:** verified pre-commit backup, legacy fingerprints before and after every commit, `test_ac10_restore_integrity.py` (5), `docs/05-data-migration/restore-and-integrity-report.md` | Done |
 | NFR 02 | Security & privacy | Least privilege, secure secrets, audit logging, input validation, encrypted transport | Engineering standards §2; RBAC; argon2; JWT; audit log; TLS proxy; masked logs | Security test suite, bandit/pip-audit reports; **Stage 3:** 18 auth, token, audit, masking and error tests (see `docs/06-testing/baseline-test-report.md`); **Stage 7:** `docs/06-testing/security-checks.md` (scanners, 18 live checks, threat review), DEF-009 and DEF-010 closed | Done |
-| NFR 03 | Compatibility | Windows 11 clients, Windows Server 2022+, Ethernet, isolated-site deployment | Browser-based client; Docker Compose host; offline bundle; documented Windows Server notes | Deployment guide, environment checklist | Partial: Windows 11 host and browser verified (AC 09 rehearsal, UAT); Windows Server notes in the deployment guide (release) |
-| NFR 04 | Licensing | Identify dependencies & licences; pin versions; document offline/redistribution restrictions | Lockfiles, SBOM, licence inventory | `docs/04-repository/sbom-and-licences.md`; **Stage 3:** exact pins in `requirements*.txt` and `package-lock.json`; pip-audit and npm audit clean | In progress |
+| NFR 03 | Compatibility | Windows 11 clients, Windows Server 2022+, Ethernet, isolated-site deployment | Browser-based client; Docker Compose host; offline bundle; documented Windows Server notes | Deployment guide, environment checklist | Partial: Windows 11 host and browser verified (AC 09 rehearsal, UAT); Windows Server 2022 requirements in `docs/07-deployment/environment-checklist.md`, not rehearsed (backlog) |
+| NFR 04 | Licensing | Identify dependencies & licences; pin versions; document offline/redistribution restrictions | Lockfiles, SBOM, licence inventory | `docs/04-repository/sbom-and-licences.md`; **Stage 3:** exact pins in `requirements*.txt` and `package-lock.json`; pip-audit and npm audit clean; **Release:** `docs/04-repository/sbom-and-licences.md` (from the shipped images), `sbom/` folder in every bundle | Done |
 | NFR 05 | Testability | Functional, integration, performance, migration, security, regression, UAT evidence | pytest suites per type, acceptance tests per AC, perf script, UAT checklist | `docs/06-testing/`; **Stage 7:** test plan, results, generated test-to-requirement matrix, performance (DEF-008 known limitation), security, UAT | Done |
-| NFR 06 | Maintainability | Modular adapters, external config, structured logs, versioned migrations, documented builds, rollback | Adapter interfaces, `.env` config, JSON logs, Alembic, build docs, rollback scripts | Architecture package, ops scripts; **Stage 3:** adapter registry, `.env` configuration, JSON logs, Alembic 0001–0002 with downgrade, `test_adr0003_no_raw_sql_in_application_code` | In progress |
-| NFR 07 | Supportability | Diagnostics, health checks, structured logs, runbooks | `/health`, `/version`, device heartbeat, JSON logs with correlation IDs, runbook | `docs/08-operations/troubleshooting-runbook.md`; **Stage 3:** `/api/v1/health` (database check), `/api/v1/version` (migration revision), `test_nfr07_*` | In progress |
-| NFR 08 | Documentation | Architecture, device config, IP/interface details, API docs, versions, install, admin, user, troubleshooting | Documentation packages D2, D7, D8 | `docs/` | Planned |
-| NFR 09 | Delivery | Complete D0–D10; identify all remaining production work | SOP stage gates, production-completion backlog | `docs/09-demo/production-backlog.md` | Planned |
+| NFR 06 | Maintainability | Modular adapters, external config, structured logs, versioned migrations, documented builds, rollback | Adapter interfaces, `.env` config, JSON logs, Alembic, build docs, rollback scripts | Architecture package, ops scripts; **Stage 3:** adapter registry, `.env` configuration, JSON logs, Alembic 0001–0002 with downgrade, `test_adr0003_no_raw_sql_in_application_code`; **Release:** adapter switching in `docs/07-deployment/configuration-guide.md`, reversible migrations (`test_migrations.py`), documented builds and rollback | Done |
+| NFR 07 | Supportability | Diagnostics, health checks, structured logs, runbooks | `/health`, `/version`, device heartbeat, JSON logs with correlation IDs, runbook | `docs/08-operations/troubleshooting-runbook.md`; **Stage 3:** `/api/v1/health` (database check), `/api/v1/version` (migration revision), `test_nfr07_*`; **Release:** `/health` 503 when degraded (DEF-016), restart policy (DEF-018), `docs/08-operations/troubleshooting-runbook.md` | Done |
+| NFR 08 | Documentation | Architecture, device config, IP/interface details, API docs, versions, install, admin, user, troubleshooting | Documentation packages D2, D7, D8 | `docs/`; **Release:** D2, D5, D7 (`docs/07-deployment/`), D8 (`docs/08-operations/`, `openapi.json`) | Done |
+| NFR 09 | Delivery | Complete D0–D10; identify all remaining production work | SOP stage gates, production-completion backlog | `docs/09-demo/production-backlog.md`; **Release:** stage gates 1–7 and the release record, `docs/09-demo/production-backlog.md` | Done (demo recording link to be added in `docs/09-demo/README.md`) |
 
 ## 3. Priority acceptance scenarios
 
@@ -66,12 +66,12 @@ Module and test columns are filled in from Stage 2 (design) and Stage 7 (verific
 | D1 | Requirements package | `docs/01-requirements/` | 1–2 | Done |
 | D2 | Architecture package | `docs/02-design/` | 2 | Done |
 | D3 | Working prototype | `backend/`, `frontend/`, `device-sim/` | 3–5 | Done |
-| D4 | Source repository | repo root, `docs/04-repository/` | 1–7 | In progress |
+| D4 | Source repository | repo root, `docs/04-repository/` | 1–7 | Done |
 | D5 | Database & migration | `backend/app/db/`, `migration/`, `docs/05-data-migration/` | 3, 6 | Done |
 | D6 | Test package | `backend/tests/`, `docs/06-testing/` | 3–7 | Done |
-| D7 | Deployment package | `ops/`, `docs/07-deployment/` | Release | Planned |
-| D8 | Operational documentation | `docs/08-operations/` | Release | Planned |
-| D9 | Demonstration | `docs/09-demo/` | Release | Planned |
+| D7 | Deployment package | `ops/`, `docs/07-deployment/` | Release | Done |
+| D8 | Operational documentation | `docs/08-operations/` | Release | Done |
+| D9 | Demonstration | `docs/09-demo/` | Release | Done (recording link to be added) |
 
 ## 5. Change history
 
@@ -84,3 +84,4 @@ Module and test columns are filled in from Stage 2 (design) and Stage 7 (verific
 | 0.5 | 2026-10-07 | RFID middleware and integrations: FR 05, FR 06, FR 11, AC 02, AC 03, AC 05, AC 06, AC 07 done; FR 03, FR 07, FR 09 done against mocks |
 | 0.6 | 2026-10-07 | Migration and resilience: FR 02, FR 10, NFR 01, AC 01, AC 10 done; D5 done |
 | 0.7 | 2026-10-08 | Verification: FR 12, NFR 02, NFR 05, AC 09 done; NFR 03 partial; D3 and D6 done |
+| 0.8 | 2026-10-19 | Release 1.0.2: NFR 04, 06, 07, 08, 09 and D4, D7, D8, D9 done; NFR 03 stays partial (Windows Server not rehearsed); release-stage defects DEF-015 to DEF-024 fixed |

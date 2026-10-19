@@ -59,6 +59,8 @@ These keys are not in `.env.example`. Add them to `.env` only to change the defa
 | `OUTBOX_DIR` | Folder for mock notification output | Fixed by compose: `/app/outbox` (volume `nexus_outbox`) |
 | `BACKUP_DIR` | Backup folder | Fixed by compose: `/backups` (volume `nexus_backups`) |
 | `LICENCE_FILE` | Licence file path | Fixed by compose: `/app/licence/licence.json` (host folder `licence/`, read-only) |
+| `DEMO_PUBLIC_ACCOUNTS` | Public demonstration instances only: the login page lists sign-in details for Librarian, Circulation Clerk, Auditor and Patron `B00001`, never Admin; a warning is logged at start-up | `false` |
+| `DEMO_PUBLIC_PASSWORD` | Password the seed gives those four accounts (at least 12 characters when `DEMO_PUBLIC_ACCOUNTS` is on); set it before the first `--demo` seed, and use it nowhere else | empty |
 
 Rate limits use the `slowapi` format: `<count>/<second|minute|hour|day>`.
 

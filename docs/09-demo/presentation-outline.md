@@ -157,7 +157,7 @@ Source: [known-limitations.md](known-limitations.md).
 - HMAC licences (the site holds the key); self-signed certificate; SIP2 has no transport security, so its listener is off by default.
 - Acquisition and serials minimal or absent (FR 01 Partial); Windows Server 2022 not yet verified (NFR 03 Partial).
 - No supported way to register an NCIP agency yet.
-- The maintenance notice is stored but not displayed; the System health screen does not show a failing check (both found while preparing 1.0.2).
+- The maintenance notice is stored but not displayed (found while preparing 1.0.2). The System health screen regression found in the same review was fixed (DEF-024).
 
 ## 13. Production backlog
 

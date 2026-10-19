@@ -79,4 +79,5 @@ First run on 2026-10-07 against the development stack (`https://localhost:8443`)
 | DEF-017: an empty SIP2 allow-list accepted every address | S2 | Closed in 1.0.2 |
 | DEF-023: SIP2 Patron Status disclosed the member's full name | S3 | Closed in 1.0.2 |
 | Observation: device ingest validates the event body before checking the device key, so an unauthenticated caller with a malformed body gets 422 rather than 401 | Not a defect | The envelope schema is already public in the OpenAPI document, nothing is processed or stored, and the ingest rate limit applies. Recorded for the production backlog (authenticate first) |
+| Design note: `DEMO_PUBLIC_ACCOUNTS` (release 1.0.3) publishes sign-in details for four non-admin accounts on demonstration instances. It is off by default, logs a warning when on, never lists Admin, and is covered by `test_demo_accounts.py` | Not a defect | Only for instances with synthetic data; see the hosting options checklist |
 | Observation: fixed development passwords appear in `config.py` defaults, `conftest.py` and the CI workflow | Not a defect | They belong to throwaway local and CI databases, and production refuses them (DEF-009) |

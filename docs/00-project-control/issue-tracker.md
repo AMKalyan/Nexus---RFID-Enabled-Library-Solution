@@ -41,3 +41,4 @@ Status values: Open, In progress, Done, Deferred.
 | NX-064 | Identify the cause of the intermittent test stall (DEF-012) | backlog, defect | Backlog | Open | |
 | NX-070 | Release, deployment package, operational docs, demonstration | release, FR-12 | Release | Done | Release merge (`v1.0.0-eval`) |
 | NX-071 | Release-stage defects DEF-015 to DEF-024 (found while writing the release documentation) | release, defect, NFR-02, NFR-07 | Release | Done | Release 1.0.2 |
+| NX-072 | Demo sign-in details on the login page and hosting guide for a public demonstration | release, NFR-08 | Release | Done | Release 1.0.3 |

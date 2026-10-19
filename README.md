@@ -4,7 +4,7 @@ Nexus is a modular prototype that adds RFID workflows to an existing Integrated 
 
 All external devices and services are integrated through documented adapter interfaces with working mocks: RFID readers, handhelds, gates, smart cards, CCTV, email, SMS, printing, the legacy ILMS, and NCIP/SIP2 endpoints. All data and credentials in this repository are synthetic.
 
-**Current release: 1.0.2** (schema revision `0004`). See [RELEASE-NOTES.md](RELEASE-NOTES.md).
+**Current release: 1.0.3** (schema revision `0004`). See [RELEASE-NOTES.md](RELEASE-NOTES.md).
 
 ## Acceptance scenarios
 
@@ -104,6 +104,10 @@ bash ops/ci-local.sh              # format, lint, types, bandit, dependency audi
 ```
 
 The same steps run in [`.github/workflows/ci.yml`](.github/workflows/ci.yml).
+
+## Hosting a public demonstration
+
+Netlify or Vercel alone cannot run Nexus, which needs an always-on API with WebSockets and PostgreSQL. [Hosting options](docs/07-deployment/hosting-options.md) covers a single VM (recommended), a split UI/API set-up, and the publication checklist. On a demonstration instance, `DEMO_PUBLIC_ACCOUNTS=true` lists non-admin demo sign-in details on the login page.
 
 ## Known limitations
 

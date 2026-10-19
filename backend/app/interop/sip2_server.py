@@ -1,6 +1,7 @@
 """Optional SIP2 TCP listener (disabled by default: SIP2_LISTENER_ENABLED=false).
 
-SIP2 has no transport security, so the listener accepts only addresses in SIP2_ALLOWED_HOSTS.
+SIP2 has no transport security, so the listener accepts only addresses in SIP2_ALLOWED_HOSTS. An empty list
+refuses every connection.
 """
 
 import asyncio
@@ -20,7 +21,7 @@ def _handle_sync(message: str) -> str:
 
 async def _client(reader: asyncio.StreamReader, writer: asyncio.StreamWriter, allowed: set[str]) -> None:
     peer = writer.get_extra_info("peername")
-    if allowed and (not peer or peer[0] not in allowed):
+    if not peer or peer[0] not in allowed:  # an empty allow-list refuses everyone (DEF-017)
         log.warning("SIP2 connection refused from %s", peer[0] if peer else "unknown")
         writer.close()
         return
@@ -40,4 +41,6 @@ async def _client(reader: asyncio.StreamReader, writer: asyncio.StreamWriter, al
 async def start(host: str, port: int, allowed: set[str]) -> asyncio.base_events.Server:
     server = await asyncio.start_server(lambda r, w: _client(r, w, allowed), host, port, limit=MAX_MESSAGE)
     log.info("SIP2 listener on %s:%s", host, port)
+    if not allowed:
+        log.warning("SIP2_ALLOWED_HOSTS is empty: every SIP2 connection will be refused")
     return server

@@ -4,7 +4,8 @@ Speaks the same HTTP event contract as a real device bridge (docs/02-design/inte
 
     python sim.py tap --reader CARD-01 --uid 04A1B2C3
     python sim.py scan --station STAFF-01 --epc E2801160...
-    python sim.py sweep --handheld HH-01 --shelf A-01 --session <inventory-session-id> [--omit 2] [--add-foreign B-01]
+    python sim.py sweep --handheld HH-01 --shelf A-01 --session <inventory-session-id> \
+        [--omit 2] [--add-foreign B-01]
     python sim.py gate --gate GATE-01 --epc E2801160... [--direction out] [--bit on|off]
     python sim.py footfall --gate GATE-01 --in 3 --out 1
     python sim.py heartbeat --all
@@ -37,7 +38,12 @@ import httpx
 HERE = Path(__file__).resolve().parent
 STATE_DIR = Path(os.environ.get("SIM_STATE_DIR", HERE / ".state"))
 CREDENTIALS = Path(os.environ.get("SIM_CREDENTIALS", HERE.parent / "ops" / "demo-credentials.txt"))
-DEVICE_TYPES = {"STAFF": "staff_station", "HH": "handheld", "GATE": "gate", "CARD": "smartcard_reader"}
+DEVICE_TYPES = {
+    "STAFF": "staff_station",
+    "HH": "handheld",
+    "GATE": "gate",
+    "CARD": "smartcard_reader",
+}
 
 
 # --- building blocks (unit-tested) ------------------------------------------------------------------
@@ -106,6 +112,10 @@ def device_type_for(code: str) -> str:
     return DEVICE_TYPES.get(code.split("-")[0], "handheld")
 
 
+# Refusals worth retrying later; other 4xx answers mean the event itself is invalid (DEF-022).
+RETRY_STATUSES = {401, 403, 429}
+
+
 # --- talking to Nexus --------------------------------------------------------------------------------
 
 
@@ -137,13 +147,26 @@ class Simulator:
         key = self.keys.get(code)
         if not key:
             raise SystemExit(f"No key for device {code}. Seed the database or set SIM_DEVICE_KEYS.")
-        return self.http.post(f"{self.api}/devices/{code}/events", json=event, headers={"X-Device-Key": key})
+        return self.http.post(
+            f"{self.api}/devices/{code}/events",
+            json=event,
+            headers={"X-Device-Key": key},
+        )
 
     def _deliver_queued(self, item: dict[str, Any]) -> bool:
+        """True when the event can leave the queue: accepted, or invalid (retrying cannot help)."""
         try:
-            return self._post(item["device"], item["event"]).status_code < 500
+            status = self._post(item["device"], item["event"]).status_code
         except httpx.HTTPError:
             return False
+        if status in RETRY_STATUSES or status >= 500:
+            return False  # throttled, not authorised yet (key, licence) or failing: keep it and its place
+        if status >= 400:
+            print(
+                f"dropping queued {item['event']['type']}: Nexus rejected it with {status}",
+                file=sys.stderr,
+            )
+        return True
 
     def send(self, code: str, event: dict[str, Any]) -> str:
         if self.offline:
@@ -156,9 +179,9 @@ class Simulator:
                 event["payload"]["offline_decision"] = True  # the gate decided on its own
             self.queue.append({"device": code, "event": event})
             return f"Nexus unreachable: queued {event['type']} for replay"
-        if r.status_code >= 500:
+        if r.status_code >= 500 or r.status_code in RETRY_STATUSES:
             self.queue.append({"device": code, "event": event})
-            return f"Nexus error {r.status_code}: queued for replay"
+            return f"Nexus answered {r.status_code}: queued for replay"
         return f"{r.status_code} {r.text}"
 
     def staff_token(self) -> str:
@@ -190,7 +213,12 @@ class Simulator:
         return self.send(station, build_event("staff_station", "TagsRead", epcs, mode="single"))
 
     def sweep(
-        self, handheld: str, shelf: str, session_id: str, omit: int = 0, foreign: str | None = None
+        self,
+        handheld: str,
+        shelf: str,
+        session_id: str,
+        omit: int = 0,
+        foreign: str | None = None,
     ) -> str:
         epcs = self.shelf_epcs(shelf)
         random.shuffle(epcs)
@@ -212,11 +240,18 @@ class Simulator:
         return f"gate {decision}{mode}: " + self.send(gate, event)
 
     def footfall(self, gate: str, ins: int, outs: int) -> str:
-        return self.send(gate, build_event("gate", "Footfall", in_count=ins, out_count=outs, window_s=60))
+        return self.send(
+            gate,
+            build_event("gate", "Footfall", in_count=ins, out_count=outs, window_s=60),
+        )
 
     def heartbeat(self, codes: list[str]) -> str:
-        return "\n".join(f"{c}: " + self.send(c, build_event(device_type_for(c), "Heartbeat", firmware="sim-1.0"))
-                         for c in codes)  # fmt: skip
+        lines = []
+        for c in codes:
+            lines.append(
+                f"{c}: " + self.send(c, build_event(device_type_for(c), "Heartbeat", firmware="sim-1.0"))
+            )
+        return "\n".join(lines)
 
 
 # --- web panel ---------------------------------------------------------------------------------------
@@ -281,7 +316,12 @@ def main(argv: list[str] | None = None) -> None:
     p.add_argument("--gate", default="GATE-01")
     p.add_argument("--epc", required=True)
     p.add_argument("--direction", choices=["in", "out"], default="out")
-    p.add_argument("--bit", choices=["on", "off"], default="on", help="security bit carried by the tag")
+    p.add_argument(
+        "--bit",
+        choices=["on", "off"],
+        default="on",
+        help="security bit carried by the tag",
+    )
     p = sub.add_parser("footfall")
     p.add_argument("--gate", default="GATE-01")
     p.add_argument("--in", dest="ins", type=int, default=1)

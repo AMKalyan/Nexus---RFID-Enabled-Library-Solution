@@ -6,6 +6,7 @@ Security and robustness release. No schema change (revision `0004`).
 
 - **Client address cannot be spoofed (DEF-015).** nginx now overwrites `X-Forwarded-For`, so sign-in rate limits hold and the audit log records the real client address.
 - **`/api/v1/health` returns 503 when a check fails (DEF-016).** The Docker health check and the update's automatic rollback now see a database failure.
+- **The System health screen shows failing checks again (DEF-024).** It reads the 503 report instead of treating it as an error.
 - **SIP2 listener (DEF-017):** an empty `SIP2_ALLOWED_HOSTS` refuses every connection.
 - **SIP2 Patron Status (DEF-023)** carries initials instead of the member's full name.
 - **Containers restart after a host or Docker restart (DEF-018).**

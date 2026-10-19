@@ -48,3 +48,12 @@ export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
   if (!res.ok) throw new ApiError(body.code ?? "ERR_UNKNOWN", body.error ?? "Request failed", res.status);
   return body as T;
 }
+
+export type Health = { status: string; checks: Record<string, boolean> };
+
+// /health answers 503 with a full report when a check fails (DEF-016); that report is what the screen must show.
+export async function getHealth(): Promise<Health> {
+  const res = await send("/health");
+  if (res.status === 200 || res.status === 503) return (await res.json()) as Health;
+  throw new ApiError("ERR_UNKNOWN", "Health check unavailable", res.status);
+}
